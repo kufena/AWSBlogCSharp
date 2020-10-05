@@ -109,6 +109,5 @@ namespace AWSBlogCSharp
             options.UseMySQL(secret);
             return new BlogPostContext(options.Options);
         }
-
     }
 }
