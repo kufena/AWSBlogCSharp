@@ -20,11 +20,7 @@ namespace AWSBlogCSharp
         BlogPostContext bpc;
 
         public BlogPostsGetAll() {
-            var connectionString = GetConnectionString.GetSecret();
-            Console.WriteLine(connectionString);
-            var options = new DbContextOptionsBuilder<BlogPostContext>();
-            options.UseMySQL(connectionString);
-            bpc = new BlogPostContext(options.Options);
+            bpc = GetConnectionString.GetSecret();
         }
 
         /// <summary>

@@ -3,108 +3,112 @@ using System.IO;
 using Amazon;
 using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
+using AWSBlogCSharp.Database;
+using Microsoft.EntityFrameworkCore;
 
+/*
+*	Use this code snippet in your app.
+*	If you need more information about configurations or implementing the sample code, visit the AWS docs:
+*	https://aws.amazon.com/developers/getting-started/net/
+*	
+*	Make sure to include the following packages in your code.
+*	
+*	using System;
+*	using System.IO;
+*
+*	using Amazon;
+*	using Amazon.SecretsManager;
+*	using Amazon.SecretsManager.Model;
+*
+*/
 namespace AWSBlogCSharp
 {
     class GetConnectionString
     {
-        
- /*
- *	Use this code snippet in your app.
- *	If you need more information about configurations or implementing the sample code, visit the AWS docs:
- *	https://aws.amazon.com/developers/getting-started/net/
- *	
- *	Make sure to include the following packages in your code.
- *	
- *	using System;
- *	using System.IO;
- *
- *	using Amazon;
- *	using Amazon.SecretsManager;
- *	using Amazon.SecretsManager.Model;
- *
- */
 
-            /*
-             * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
-             */
-            public static string GetSecret()
+        /*
+         * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
+         */
+        public static BlogPostContext GetSecret()
+        {
+            string secretName = "blogposts.connectionstring";
+            string region = "eu-west-2";
+            string secret = "";
+
+            MemoryStream memoryStream = new MemoryStream();
+
+            IAmazonSecretsManager client = new AmazonSecretsManagerClient(RegionEndpoint.GetBySystemName(region));
+
+            GetSecretValueRequest request = new GetSecretValueRequest();
+            request.SecretId = secretName;
+            request.VersionStage = "AWSCURRENT"; // VersionStage defaults to AWSCURRENT if unspecified.
+
+            GetSecretValueResponse response = null;
+
+            // In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
+            // See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+            // We rethrow the exception by default.
+
+            try
             {
-                string secretName = "blogposts.connectionstring";
-                string region = "eu-west-2";
-                string secret = "";
+                response = client.GetSecretValueAsync(request).Result;
+            }
+            catch (DecryptionFailureException e)
+            {
+                // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+                // Deal with the exception here, and/or rethrow at your discretion.
+                throw;
+            }
+            catch (InternalServiceErrorException e)
+            {
+                // An error occurred on the server side.
+                // Deal with the exception here, and/or rethrow at your discretion.
+                throw;
+            }
+            catch (InvalidParameterException e)
+            {
+                // You provided an invalid value for a parameter.
+                // Deal with the exception here, and/or rethrow at your discretion
+                throw;
+            }
+            catch (InvalidRequestException e)
+            {
+                // You provided a parameter value that is not valid for the current state of the resource.
+                // Deal with the exception here, and/or rethrow at your discretion.
+                throw;
+            }
+            catch (ResourceNotFoundException e)
+            {
+                // We can't find the resource that you asked for.
+                // Deal with the exception here, and/or rethrow at your discretion.
+                throw;
+            }
+            catch (System.AggregateException ae)
+            {
+                // More than one of the above exceptions were triggered.
+                // Deal with the exception here, and/or rethrow at your discretion.
+                throw;
+            }
 
-                MemoryStream memoryStream = new MemoryStream();
-
-                IAmazonSecretsManager client = new AmazonSecretsManagerClient(RegionEndpoint.GetBySystemName(region));
-
-                GetSecretValueRequest request = new GetSecretValueRequest();
-                request.SecretId = secretName;
-                request.VersionStage = "AWSCURRENT"; // VersionStage defaults to AWSCURRENT if unspecified.
-
-                GetSecretValueResponse response = null;
-
-                // In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
-                // See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-                // We rethrow the exception by default.
-
-                try
-                {
-                    response = client.GetSecretValueAsync(request).Result;
-                }
-                catch (DecryptionFailureException e)
-                {
-                    // Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-                    // Deal with the exception here, and/or rethrow at your discretion.
-                    throw;
-                }
-                catch (InternalServiceErrorException e)
-                {
-                    // An error occurred on the server side.
-                    // Deal with the exception here, and/or rethrow at your discretion.
-                    throw;
-                }
-                catch (InvalidParameterException e)
-                {
-                    // You provided an invalid value for a parameter.
-                    // Deal with the exception here, and/or rethrow at your discretion
-                    throw;
-                }
-                catch (InvalidRequestException e)
-                {
-                    // You provided a parameter value that is not valid for the current state of the resource.
-                    // Deal with the exception here, and/or rethrow at your discretion.
-                    throw;
-                }
-                catch (ResourceNotFoundException e)
-                {
-                    // We can't find the resource that you asked for.
-                    // Deal with the exception here, and/or rethrow at your discretion.
-                    throw;
-                }
-                catch (System.AggregateException ae)
-                {
-                    // More than one of the above exceptions were triggered.
-                    // Deal with the exception here, and/or rethrow at your discretion.
-                    throw;
-                }
-
-                // Decrypts secret using the associated KMS CMK.
-                // Depending on whether the secret is a string or binary, one of these fields will be populated.
-                if (response.SecretString != null)
-                {
-                    secret = response.SecretString;
-                }
-                else
-                {
-                    memoryStream = response.SecretBinary;
-                    StreamReader reader = new StreamReader(memoryStream);
-                    string decodedBinarySecret = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(reader.ReadToEnd()));
-                }
+            // Decrypts secret using the associated KMS CMK.
+            // Depending on whether the secret is a string or binary, one of these fields will be populated.
+            if (response.SecretString != null)
+            {
+                secret = response.SecretString;
+            }
+            else
+            {
+                memoryStream = response.SecretBinary;
+                StreamReader reader = new StreamReader(memoryStream);
+                string decodedBinarySecret = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(reader.ReadToEnd()));
+            }
 
             // Your code goes here.
-            return secret;
-            }
-        
+            Console.WriteLine(secret);
+            var options = new DbContextOptionsBuilder<BlogPostContext>();
+            options.UseMySQL(secret);
+            return new BlogPostContext(options.Options);
+        }
+
     }
 }
