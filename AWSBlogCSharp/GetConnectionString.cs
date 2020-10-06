@@ -5,6 +5,7 @@ using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
 using AWSBlogCSharp.Database;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 /*
 *	Use this code snippet in your app.
@@ -104,9 +105,13 @@ namespace AWSBlogCSharp
             }
 
             // Your code goes here.
-            Console.WriteLine(secret);
+            // Our secret is actually a JSON structure - get the blogposts.connectionstring element out of it.
+            var secretJson = JsonConvert.DeserializeObject<ConnectionString>(secret);
+
+            //
+            Console.WriteLine(secretJson.connectionstring);
             var options = new DbContextOptionsBuilder<BlogPostContext>();
-            options.UseMySQL(secret);
+            options.UseMySQL(secretJson.connectionstring);
             return new BlogPostContext(options.Options);
         }
     }

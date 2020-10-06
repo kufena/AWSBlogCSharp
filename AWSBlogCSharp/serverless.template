@@ -13,7 +13,8 @@
         "Timeout": 30,
         "Role": null,
         "Policies": [
-          "AWSLambdaBasicExecutionRole"
+          "AWSLambdaBasicExecutionRole",
+          "SecretsManagerReadWrite"
         ],
         "Events": {
           "RootGet": {
@@ -36,7 +37,8 @@
         "Timeout": 30,
         "Role": null,
         "Policies": [
-          "AWSLambdaBasicExecutionRole"
+          "AWSLambdaBasicExecutionRole",
+          "SecretsManagerReadWrite"
         ],
         "Events": {
           "RootGet": {
