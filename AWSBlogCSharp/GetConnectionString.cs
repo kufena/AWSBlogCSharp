@@ -109,7 +109,6 @@ namespace AWSBlogCSharp
             var secretJson = JsonConvert.DeserializeObject<ConnectionString>(secret);
 
             //
-            Console.WriteLine(secretJson.connectionstring);
             var options = new DbContextOptionsBuilder<BlogPostContext>();
             options.UseMySQL(secretJson.connectionstring);
             return new BlogPostContext(options.Options);

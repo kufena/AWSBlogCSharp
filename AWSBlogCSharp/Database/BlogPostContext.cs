@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using MySQL.Data.EntityFrameworkCore;
 
 namespace AWSBlogCSharp.Database
 {
     public class BlogPostContext : DbContext
     {
+        public BlogPostContext() { }
+
         public BlogPostContext(DbContextOptions<BlogPostContext> options) : base(options)
         { }
 

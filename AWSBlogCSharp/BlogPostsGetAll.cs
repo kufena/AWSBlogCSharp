@@ -34,16 +34,8 @@ namespace AWSBlogCSharp
             context.Logger.LogLine("Get ALL Request\n");
             int c = -19929;
 
-            //using (bpc)
-            //{
-                context.Logger.LogLine("Inside the using bit.");
-                var x = from blog in bpc.BlogPost select blog;
-                context.Logger.LogLine("Now we've done the select");
-                c = x.Count();
-                context.Logger.LogLine("Now we have c - oh, need to declare that outside don't I");
-            //}
-
-            context.Logger.LogLine("{ \"fred\": \"All the posts from the fair. " + c + "\" }");
+            var x = from blog in bpc.BlogPost select blog;
+            c = x.Count();
             
             var response = new APIGatewayProxyResponse
             {

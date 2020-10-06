@@ -20,7 +20,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/blog/",
+              "Path": "/blog/{id}",
               "Method": "GET"
             }
           }
