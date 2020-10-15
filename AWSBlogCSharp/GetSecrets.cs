@@ -1,36 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Amazon;
 using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
-using AWSBlogCSharp.Database;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
-/*
-*	Use this code snippet in your app.
-*	If you need more information about configurations or implementing the sample code, visit the AWS docs:
-*	https://aws.amazon.com/developers/getting-started/net/
-*	
-*	Make sure to include the following packages in your code.
-*	
-*	using System;
-*	using System.IO;
-*
-*	using Amazon;
-*	using Amazon.SecretsManager;
-*	using Amazon.SecretsManager.Model;
-*
-*/
 namespace AWSBlogCSharp
 {
-    class GetConnectionString
+    class GetSecrets
     {
-
         /*
-         * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
-         */
-        public static BlogPostContext GetSecret()
+ * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
+ */
+        public static Dictionary<string, string> GetSecrets()
         {
             string secretName = "blogposts.connectionstring";
             string region = "eu-west-2";
@@ -106,12 +90,9 @@ namespace AWSBlogCSharp
 
             // Your code goes here.
             // Our secret is actually a JSON structure - get the blogposts.connectionstring element out of it.
-            var secretJson = JsonConvert.DeserializeObject<ConnectionString>(secret);
+            var secretJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(secret);
 
-            //
-            //var options = new DbContextOptionsBuilder<BlogPostContext>();
-            //options.UseMySQL(secretJson.connectionstring);
-            //return new BlogPostContext(options.Options);
+            return secretJson;
         }
     }
 }
