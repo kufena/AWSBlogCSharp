@@ -24,9 +24,8 @@ namespace AWSBlogCSharp
 
         public BlogPostsCreate()
         {
-            secrets = GetSecrets.GetSecrets();
-            bpc = GetConnectionString.GetConnectionString(secrets);
-        }
+            secrets = GetSecrets.GetSecretsDictionary();
+            bpc = GetConnectionString.GetContext(secrets);        }
 
         /// <summary>
         /// A Lambda function to respond to HTTP Get methods from API Gateway
@@ -74,7 +73,7 @@ namespace AWSBlogCSharp
                             StatusCode = (int)HttpStatusCode.OK,
                             Body = "{ \"URL\" = \"/blog/" + $"{id}" + "\" }",
                             Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
-                }
+                };
             }
             return response;
         }

@@ -14,7 +14,7 @@ namespace AWSBlogCSharp
         /*
         * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
         */
-        public static Dictionary<string, string> GetSecrets()
+        public static Dictionary<string, string> GetSecretsDictionary()
         {
             string secretName = "blogposts.connectionstring";
             string region = "eu-west-2";

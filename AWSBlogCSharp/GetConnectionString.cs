@@ -31,7 +31,7 @@ namespace AWSBlogCSharp
         /*
          * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
          */
-        public static BlogPostContext GetConnectionString(Dictionary<string,string> secrets)
+        public static BlogPostContext GetContext(Dictionary<string,string> secrets)
         {
             var options = new DbContextOptionsBuilder<BlogPostContext>();
             options.UseMySQL(secrets["connectionstring"]);
