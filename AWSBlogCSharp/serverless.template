@@ -68,7 +68,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/blog/{id}",
+              "Path": "blog/",
               "Method": "POST"
             }
           }
@@ -92,7 +92,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/{id}",
+              "Path": "blog/{id}",
               "Method": "PUT"
             }
           }

@@ -25,8 +25,9 @@ namespace AWSBlogCSharp
         public BlogPostsCreate()
         {
             secrets = GetSecrets.GetSecretsDictionary();
-            bpc = GetConnectionString.GetContext(secrets);        }
-
+            bpc = GetConnectionString.GetContext(secrets);  
+        }
+        
         /// <summary>
         /// A Lambda function to respond to HTTP Get methods from API Gateway
         /// </summary>
