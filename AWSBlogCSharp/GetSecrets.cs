@@ -9,11 +9,11 @@ using Newtonsoft.Json;
 
 namespace AWSBlogCSharp
 {
-    class GetSecrets
+    public class GetSecrets
     {
         /*
- * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
- */
+        * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
+        */
         public static Dictionary<string, string> GetSecrets()
         {
             string secretName = "blogposts.connectionstring";

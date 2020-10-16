@@ -17,10 +17,12 @@ namespace AWSBlogCSharp
 {
     class BlogPostsGetAll
     {
+        Dictionary<string,string> secrets;
         BlogPostContext bpc;
 
         public BlogPostsGetAll() {
-            bpc = GetConnectionString.GetSecret();
+            secrets = GetSecrets.GetSecrets();
+            bpc = GetConnectionString.GetConnectionString(secrets);
         }
 
         /// <summary>

@@ -54,7 +54,7 @@
     "Create": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
-        "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsGetAll::Get",
+        "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsCreate::Create",
         "Runtime": "dotnetcore3.1",
         "CodeUri": "",
         "MemorySize": 256,
@@ -68,8 +68,8 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/",
-              "Method": "GET"
+              "Path": "/blog/{id}",
+              "Method": "POST"
             }
           }
         }
@@ -92,8 +92,8 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/",
-              "Method": "GET"
+              "Path": "/{id}",
+              "Method": "PUT"
             }
           }
         }

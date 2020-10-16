@@ -1,4 +1,4 @@
-﻿using Amazon.Lambda.APIGatewayEvents;
+using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using AWSBlogCSharp.Database;
 using System;
@@ -10,21 +10,17 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using MySQL.Data.EntityFrameworkCore;
 using System.Text.Json;
-using Amazon.S3;
-using Amazon.S3.Model;
-using AWSBlogCSharp.Model;
 
 //[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace AWSBlogCSharp
 {
-    class BlogPostsGetById
+    class BlogPostsUpdate
     {
-
-        Dictionary<string,string>secrets;
+        Dictionary<string,string> secrets;
         BlogPostContext bpc;
 
-        public BlogPostsGetById()
+        public BlogPostsUpdate()
         {
             secrets = GetSecrets.GetSecrets();
             bpc = GetConnectionString.GetConnectionString(secrets);
@@ -35,9 +31,9 @@ namespace AWSBlogCSharp
         /// </summary>
         /// <param name="request"></param>
         /// <returns>The API Gateway response.</returns>
-        public APIGatewayProxyResponse Get(APIGatewayProxyRequest request, ILambdaContext context)
+        public APIGatewayProxyResponse Update(APIGatewayProxyRequest request, ILambdaContext context)
         {
-            context.Logger.LogLine("Get Request\n");
+            context.Logger.LogLine("Update Request\n");
             APIGatewayProxyResponse response;
 
             string idStr = request.PathParameters["id"];
@@ -67,15 +63,10 @@ namespace AWSBlogCSharp
                     else
                     {
                         var latest = versions.First();
-                        AmazonS3Client s3client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
-                        var resp = s3client.GetObjectAsync(secrets["blogstore"],
-                                                           latest.File);
-
-                        var model = new BlogPostModel(latest.Version,latest.Title,latest.Date, "", latest.Status);
                         response = new APIGatewayProxyResponse
                         {
                             StatusCode = (int)HttpStatusCode.OK,
-                            Body = JsonSerializer.Serialize<BlogPostModel>(model),
+                            Body = JsonSerializer.Serialize<DBBlogPost>(latest),
                             Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
                         };
                     }
