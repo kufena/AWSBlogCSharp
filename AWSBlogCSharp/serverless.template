@@ -57,7 +57,7 @@
         "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsCreate::Create",
         "Runtime": "dotnetcore3.1",
         "CodeUri": "",
-        "MemorySize": 256,
+        "MemorySize": 512,
         "Timeout": 30,
         "Role": null,
         "Policies": [
@@ -81,7 +81,7 @@
         "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsGetAll::Get",
         "Runtime": "dotnetcore3.1",
         "CodeUri": "",
-        "MemorySize": 256,
+        "MemorySize": 512,
         "Timeout": 30,
         "Role": null,
         "Policies": [

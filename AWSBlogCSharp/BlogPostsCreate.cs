@@ -33,13 +33,16 @@ namespace AWSBlogCSharp
         /// </summary>
         /// <param name="request"></param>
         /// <returns>The API Gateway response.</returns>
-        public APIGatewayProxyResponse Put(APIGatewayProxyRequest request, ILambdaContext context)
+        public APIGatewayProxyResponse Create(APIGatewayProxyRequest request, ILambdaContext context)
         {
             // We expect a model that fits BlogPostModel - so a version, but no id.
-            context.Logger.LogLine("Create Request\n");
+            Console.WriteLine("Create Request\n");
             APIGatewayProxyResponse response;
 
+            Console.WriteLine(request.Body);
+
             BlogPostModel bpm = JsonSerializer.Deserialize<BlogPostModel>( request.Body );
+            Console.WriteLine("Deserialized body");
             if (bpm.Version != 0) {
                 response = new APIGatewayProxyResponse {
                     StatusCode = (int)HttpStatusCode.BadRequest,
@@ -47,11 +50,14 @@ namespace AWSBlogCSharp
                 };
             }
             else {
+                Console.WriteLine("About to create a new id");
                 // we create an id.
                 int id = 0;            
                 var addid = bpc.BlogIds.Add(new DBBlogId());
                 bpc.SaveChanges();
                 id = addid.CurrentValues.GetValue<int>("Id");
+
+                Console.WriteLine($"New Id created :: {id}");
 
                 // let's save the body text to our S3 bucket in a file of our choosing
 
@@ -62,12 +68,15 @@ namespace AWSBlogCSharp
                             ContentBody = bpm.Text
                             });
 
+                Console.WriteLine("Written to S3");
+
                 // create a db model
                 // save the db model
                 DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, $"/Blog{id}/Version{bpm.Version}", bpm.Status );
                 bpc.BlogPost.Add(dbbp);
                 bpc.SaveChanges();
-                
+                Console.WriteLine("Written to DB");
+
                 // create a response containing the new id - perhaps also a URL - maybe just the URL?
 
                 response = new APIGatewayProxyResponse {
