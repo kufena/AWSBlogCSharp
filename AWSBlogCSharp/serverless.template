@@ -62,13 +62,44 @@
         "Role": null,
         "Policies": [
           "AWSLambdaBasicExecutionRole",
-          "SecretsManagerReadWrite"
+          "SecretsManagerReadWrite",
+          "AmazonS3FullAccess",
+          "AmazonRDSDataFullAccess",
+          {
+            "Version" : "2012-10-17",
+            "Statement" : [
+              {
+                "Effect" : "Allow",
+                "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:UnassignPrivateIpAddresses"
+                ],
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "s3:*",
+                  "rds:*",
+                  "iam:ListRoles"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+
         ],
         "Events": {
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "blog/",
+              "Path": "/blog/",
               "Method": "POST"
             }
           }
@@ -86,13 +117,15 @@
         "Role": null,
         "Policies": [
           "AWSLambdaBasicExecutionRole",
-          "SecretsManagerReadWrite"
+          "SecretsManagerReadWrite",
+          "AmazonS3FullAccess",
+          "AmazonRDSDataFullAccess"
         ],
         "Events": {
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "blog/{id}",
+              "Path": "/blog/{id}",
               "Method": "PUT"
             }
           }

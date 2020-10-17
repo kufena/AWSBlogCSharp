@@ -12,6 +12,7 @@ using MySQL.Data.EntityFrameworkCore;
 using System.Text.Json;
 using AWSBlogCSharp.Model;
 using Amazon.S3;
+using System.Threading.Tasks;
 
 //[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -33,13 +34,52 @@ namespace AWSBlogCSharp
         /// </summary>
         /// <param name="request"></param>
         /// <returns>The API Gateway response.</returns>
-        public APIGatewayProxyResponse Create(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> Create(APIGatewayProxyRequest request, ILambdaContext context)
         {
+            if (request is null) {
+                Console.WriteLine("The Effffing Request is Null - Can't do much here then.");
+                return new APIGatewayProxyResponse {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Body = "No effing request object - it's a null!"
+                };
+            }
+            else
+            {
+                Console.WriteLine("The request object is not null at least.");
+            }
             // We expect a model that fits BlogPostModel - so a version, but no id.
             Console.WriteLine("Create Request\n");
             APIGatewayProxyResponse response;
+            
+            if (request is null) {
+                Console.WriteLine("The Effffing Request is Null - Can't do much here then.");
+                return new APIGatewayProxyResponse {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Body = "No effing request object - it's a null!"
+                };
+            }
+            else
+            {
+                Console.WriteLine("The request object is not null at least.");
+            }
 
-            Console.WriteLine(request.Body);
+            if (request.Headers is null) {
+                Console.WriteLine("The Effffing Request Headers is Null - Can't do much here then.");
+                return new APIGatewayProxyResponse {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Body = "No effing request object - it's a null!"
+                };
+            }
+            else
+            {
+                Console.WriteLine("The request headers object is not null at least.");
+            }
+
+            foreach(var key in request.Headers.Keys) {
+                Console.WriteLine($"Header:: {key} -> {request.Headers[key]}");
+            }
+            Console.WriteLine(request);
+            Console.WriteLine("Request body:::" + request.Body);
 
             BlogPostModel bpm = JsonSerializer.Deserialize<BlogPostModel>( request.Body );
             Console.WriteLine("Deserialized body");
@@ -53,7 +93,7 @@ namespace AWSBlogCSharp
                 Console.WriteLine("About to create a new id");
                 // we create an id.
                 int id = 0;            
-                var addid = bpc.BlogIds.Add(new DBBlogId());
+                var addid = bpc.BlogId.Add(new DBBlogId());
                 bpc.SaveChanges();
                 id = addid.CurrentValues.GetValue<int>("Id");
 
@@ -62,7 +102,7 @@ namespace AWSBlogCSharp
                 // let's save the body text to our S3 bucket in a file of our choosing
 
                 AmazonS3Client s3client = new AmazonS3Client( Amazon.RegionEndpoint.EUWest2 );//S3Region.EUW2);
-                var resp = s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest {
+                var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest {
                             BucketName = secrets["blogstore"],
                             Key = $"/Blog{id}/Version{bpm.Version}",
                             ContentBody = bpm.Text
