@@ -21,6 +21,6 @@ namespace AWSBlogCSharp.Database
         /**
          * A table used to auto generate blog ids.  Used for creation only.
          */
-        public DbSet<DBBlogId> BlogId { get; set; }
+        public DbSet<DBBlogId> BlogIds { get; set; }
     }
 }

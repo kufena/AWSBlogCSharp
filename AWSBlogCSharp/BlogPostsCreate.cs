@@ -92,9 +92,16 @@ namespace AWSBlogCSharp
             else {
                 Console.WriteLine("About to create a new id");
                 // we create an id.
-                int id = 0;            
-                var addid = bpc.BlogId.Add(new DBBlogId());
-                bpc.SaveChanges();
+                int id = 0; //(new Random()).Next(1000000);            
+                var addid = bpc.BlogIds.Add(new DBBlogId("A"));
+                int x = bpc.SaveChanges();
+                if (x == 0) {
+                    Console.WriteLine("No changes made to db - so that's no good!");
+                    return new APIGatewayProxyResponse {
+                        StatusCode = (int) HttpStatusCode.BadRequest,
+                        Body = "Nope, not having the id db thing again"
+                    };
+                }
                 id = addid.CurrentValues.GetValue<int>("Id");
 
                 Console.WriteLine($"New Id created :: {id}");
@@ -121,7 +128,7 @@ namespace AWSBlogCSharp
 
                 response = new APIGatewayProxyResponse {
                             StatusCode = (int)HttpStatusCode.OK,
-                            Body = "{ \"URL\" = \"/blog/" + $"{id}" + "\" }",
+                            Body = "{ \"URL\": \"/blog/" + $"{id}" + "\" }",
                             Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
                 };
             }
