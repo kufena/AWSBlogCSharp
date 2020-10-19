@@ -14,7 +14,9 @@
         "Role": null,
         "Policies": [
           "AWSLambdaBasicExecutionRole",
-          "SecretsManagerReadWrite"
+          "SecretsManagerReadWrite",
+          "AmazonRDSDataFullAccess",
+          "AmazonS3FullAccess"
         ],
         "Events": {
           "RootGet": {
@@ -38,7 +40,9 @@
         "Role": null,
         "Policies": [
           "AWSLambdaBasicExecutionRole",
-          "SecretsManagerReadWrite"
+          "SecretsManagerReadWrite",
+          "AmazonRDSDataFullAccess",
+          "AmazonS3FullAccess"
         ],
         "Events": {
           "RootGet": {
@@ -63,75 +67,8 @@
         "Policies": [
           "AWSLambdaBasicExecutionRole",
           "SecretsManagerReadWrite",
-          "AmazonS3FullAccess",
           "AmazonRDSDataFullAccess",
-          {
-            "Version" : "2012-10-17",
-            "Statement" : [
-                      {
-            "Sid": "SecretsManagerDbCredentialsAccess",
-            "Effect": "Allow",
-            "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:PutResourcePolicy",
-                "secretsmanager:PutSecretValue",
-                "secretsmanager:DeleteSecret",
-                "secretsmanager:DescribeSecret",
-                "secretsmanager:TagResource"
-            ],
-            "Resource": "arn:aws:secretsmanager:*:*:secret:rds-db-credentials/*"
-        },
-        {
-            "Sid": "RDSDataServiceAccess",
-            "Effect": "Allow",
-            "Action": [
-                "dbqms:CreateFavoriteQuery",
-                "dbqms:DescribeFavoriteQueries",
-                "dbqms:UpdateFavoriteQuery",
-                "dbqms:DeleteFavoriteQueries",
-                "dbqms:GetQueryString",
-                "dbqms:CreateQueryHistory",
-                "dbqms:DescribeQueryHistory",
-                "dbqms:UpdateQueryHistory",
-                "dbqms:DeleteQueryHistory",
-                "rds-data:ExecuteSql",
-                "rds-data:ExecuteStatement",
-                "rds-data:BatchExecuteStatement",
-                "rds-data:BeginTransaction",
-                "rds-data:CommitTransaction",
-                "rds-data:RollbackTransaction",
-                "secretsmanager:CreateSecret",
-                "secretsmanager:ListSecrets",
-                "secretsmanager:GetRandomPassword",
-                "tag:GetResources"
-            ],
-            "Resource": "*"
-        },{
-                "Effect" : "Allow",
-                "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface",
-                "ec2:AssignPrivateIpAddresses",
-                "ec2:UnassignPrivateIpAddresses"
-                ],
-                "Resource": "*"
-              },
-              {
-                "Effect": "Allow",
-                "Action": [
-                  "s3:*",
-                  "rds:*",
-                  "iam:ListRoles"
-                ],
-                "Resource": "*"
-              }
-            ]
-          }
-
+          "AmazonS3FullAccess"
         ],
         "Events": {
           "RootGet": {
