@@ -89,7 +89,7 @@ namespace AWSBlogCSharp
                         var resp = await s3client.GetObjectAsync(new GetObjectRequest { BucketName = "thegatehousewereham.blogposts", Key = latest.File});
                         var outstream = new StreamReader(resp.ResponseStream);
                         var text = outstream.ReadToEnd();
-                        var model = new BlogPostModel(latest.Version,latest.Title,latest.Date, text, latest.Status);
+                        var model = new BlogPostModel(latest.Version,latest.Title,latest.Date, text, latest.Status, latest.Hash);
                         response = new APIGatewayProxyResponse
                         {
                             StatusCode = (int)HttpStatusCode.OK,

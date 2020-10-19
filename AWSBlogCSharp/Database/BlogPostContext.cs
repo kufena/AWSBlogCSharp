@@ -22,5 +22,12 @@ namespace AWSBlogCSharp.Database
          * A table used to auto generate blog ids.  Used for creation only.
          */
         public DbSet<DBBlogId> BlogIds { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DBBlogPost>()
+                .HasKey(c => new { c.Id, c.Version });
+        }
+
     }
 }

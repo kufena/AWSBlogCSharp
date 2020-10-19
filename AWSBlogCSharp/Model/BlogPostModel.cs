@@ -20,17 +20,19 @@ namespace AWSBlogCSharp.Model
         private string text;
         private bool status;
         // ToDo: Think about the media for the post.  how do we want to handle this?
-        
+        private string hash;
+
         public BlogPostModel()
         { }
 
-        public BlogPostModel(int Version, string Title, DateTime Date, string Text, bool Status)
+        public BlogPostModel(int Version, string Title, DateTime Date, string Text, bool Status, string hash)
         {
             this.title = Title;
             this.date = Date;
             this.version = Version;
             this.status = Status;
             this.text = Text;
+            this.hash = hash;
         }
 
         public string Title { get => title; set => title = value; }
@@ -38,6 +40,7 @@ namespace AWSBlogCSharp.Model
         public DateTime Date { get => date; set => date = value; }
         public bool Status { get => status; set => status = value; }
         public string Text { get => text; set => text = value; }
+        public string Hash { get => hash; set => hash = value; }
 
         public (int, bool, string, DateTime, string) Deconstruct()
         {

@@ -13,6 +13,8 @@ using System.Text.Json;
 using AWSBlogCSharp.Model;
 using Amazon.S3;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.IO;
 
 //[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -81,7 +83,13 @@ namespace AWSBlogCSharp
 
                 // create a db model
                 // save the db model
-                DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, $"/Blog{id}/Version{bpm.Version}", bpm.Status );
+                
+                string inputstring = $"{id}:{DateTime.Now}:{bpm.Version}:{bpm.Title}:{bpm.Text}:";                
+                var base64hash = HashBlog.MakeHash(inputstring);
+                
+                Console.WriteLine("New Hash:::" + base64hash);
+
+                DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, $"/Blog{id}/Version{bpm.Version}", bpm.Status, base64hash);
                 bpc.BlogPost.Add(dbbp);
                 bpc.SaveChanges();
                 Console.WriteLine("Written to DB");

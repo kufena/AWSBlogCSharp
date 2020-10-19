@@ -13,11 +13,12 @@ namespace AWSBlogCSharp.Database
         private DateTime date;
         private string file;
         private bool status;
+        private string hash;
 
         public DBBlogPost()
         { }
 
-        public DBBlogPost(int Id, int Version, string Title, DateTime Date, string File, bool Status)
+        public DBBlogPost(int Id, int Version, string Title, DateTime Date, string File, bool Status, string hash)
         {
             this.title = Title;
             this.id = Id;
@@ -25,6 +26,7 @@ namespace AWSBlogCSharp.Database
             this.file = File;
             this.version = Version;
             this.status = Status;
+            this.hash = hash;
         }
 
         public string Title { get => title; set => title = value; }
@@ -33,10 +35,11 @@ namespace AWSBlogCSharp.Database
         public DateTime Date { get => date; set => date = value; }
         public string File { get => file; set => file = value; }
         public bool Status { get => status; set => status = value; }
+        public string Hash { get => hash; set => hash = value; }
 
-        public (int, int, bool, string, DateTime, string) Deconstruct()
+        public (int, int, bool, string, DateTime, string, string) Deconstruct()
         {
-            return (id, version, status, title, date, file);
+            return (id, version, status, title, date, file, hash);
         }
     }
 }

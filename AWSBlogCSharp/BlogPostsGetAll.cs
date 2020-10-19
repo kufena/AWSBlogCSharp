@@ -10,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using Amazon.S3;
+using System.Threading.Tasks;
+using System.IO;
+using AWSBlogCSharp.Model;
 
 [assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -30,23 +34,32 @@ namespace AWSBlogCSharp
         /// </summary>
         /// <param name="request"></param>
         /// <returns>The API Gateway response.</returns>
-        public APIGatewayProxyResponse Get(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> Get(APIGatewayProxyRequest request, ILambdaContext context)
         {
             // ToDo: Not sure this is the best way to do this - probalby ought to use a DI framework.
             context.Logger.LogLine("Get ALL Request\n");
-            int c = -19929;
-
-            var x = from blog in bpc.BlogPost select blog;
-            c = x.Count();
+            bool statusClause = false;
+            bool statusStr = false;
+            if (request.PathParameters.ContainsKey("status")) {
+                if (!Boolean.TryParse(request.PathParameters["status"], out statusStr))
+                    return new APIGatewayProxyResponse {
+                        StatusCode = (int) HttpStatusCode.BadRequest,
+                        Body = "{ \"error\":\"Bad status parameter\"}"
+                    };
+                statusClause = true;
+            }
+            IOrderedQueryable<DBBlogPost> versions;
+            if (statusClause)
+                versions = from blog in bpc.BlogPost where (blog.Status == statusStr) orderby blog.Version descending select blog;
+            else
+                versions = from blog in bpc.BlogPost orderby blog.Version descending select blog;
             
-            var response = new APIGatewayProxyResponse
+            return new APIGatewayProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = "{ \"fred\": \"All the posts from the fair. " + c + "\" }",
+                Body = "{ \"fred\": \"All the posts from the fair. \" }",
                 Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
             };
-
-            return response;
         }
     }
 }

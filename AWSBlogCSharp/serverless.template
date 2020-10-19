@@ -84,7 +84,7 @@
     "Update": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
-        "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsGetAll::Get",
+        "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsUpdate::Update",
         "Runtime": "dotnetcore3.1",
         "CodeUri": "",
         "MemorySize": 512,
