@@ -36,48 +36,10 @@ namespace AWSBlogCSharp
         /// <returns>The API Gateway response.</returns>
         public async Task<APIGatewayProxyResponse> Create(APIGatewayProxyRequest request, ILambdaContext context)
         {
-            if (request is null) {
-                Console.WriteLine("The Effffing Request is Null - Can't do much here then.");
-                return new APIGatewayProxyResponse {
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    Body = "No effing request object - it's a null!"
-                };
-            }
-            else
-            {
-                Console.WriteLine("The request object is not null at least.");
-            }
             // We expect a model that fits BlogPostModel - so a version, but no id.
             Console.WriteLine("Create Request\n");
             APIGatewayProxyResponse response;
-            
-            if (request is null) {
-                Console.WriteLine("The Effffing Request is Null - Can't do much here then.");
-                return new APIGatewayProxyResponse {
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    Body = "No effing request object - it's a null!"
-                };
-            }
-            else
-            {
-                Console.WriteLine("The request object is not null at least.");
-            }
 
-            if (request.Headers is null) {
-                Console.WriteLine("The Effffing Request Headers is Null - Can't do much here then.");
-                return new APIGatewayProxyResponse {
-                    StatusCode = (int)HttpStatusCode.BadRequest,
-                    Body = "No effing request object - it's a null!"
-                };
-            }
-            else
-            {
-                Console.WriteLine("The request headers object is not null at least.");
-            }
-
-            foreach(var key in request.Headers.Keys) {
-                Console.WriteLine($"Header:: {key} -> {request.Headers[key]}");
-            }
             Console.WriteLine(request);
             Console.WriteLine("Request body:::" + request.Body);
 
