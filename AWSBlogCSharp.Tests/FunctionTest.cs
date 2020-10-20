@@ -35,5 +35,14 @@ namespace AWSBlogCSharp.Tests
             Assert.Equal("Hello AWS Serverless", response.Body);
             */
         }
+
+        [Fact]
+        public void TestHashFunctionSame() {
+            string p = "here is a long string that should be used for testing a hash function!";
+            string q = "here is a long string that should be xsed for testing a hash function?";
+            var hash1 = HashBlog.MakeHash(p);
+            var hash2 = HashBlog.MakeHash(q);
+            Assert.NotEqual(hash1,hash2);
+        }
     }
 }

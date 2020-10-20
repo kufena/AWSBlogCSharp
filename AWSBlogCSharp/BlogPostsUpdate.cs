@@ -104,7 +104,7 @@ namespace AWSBlogCSharp
             AmazonS3Client s3client = new AmazonS3Client( Amazon.RegionEndpoint.EUWest2 );//S3Region.EUW2);
             var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest {
                         BucketName = secrets["blogstore"],
-                        Key = $"/Blog{id}/Version{bpm.Version}",
+                        Key = $"/Blog{id}/Version{newVersion}",
                         ContentBody = bpm.Text
                         });
 
