@@ -1,3 +1,26 @@
+# API for Blog Posts.
+
+So far the API looks like this:
+
+GET <root>/ 
+        - returns a list of all blog posts, without text, but dates, titles, version, status.
+        - added parameters (status=[true|false]) to choose pubished or unpublished latest versions.
+        - returns a json list of blog models.
+
+GET <root>/blog/{id}
+        - gets the blog, with text, for that id.
+        - added parameters (status=[true|false]) to get latest published version, or latest unpublished version.
+        - returns a json blog model.
+
+PUSH <root>/blog
+        - creates a new blog post.  Date is ignored, version must be zero, hash is ignored.
+        - returns a URL to the resource for that id.
+
+PUT <root>/blog/id
+        - updates a version of the blog.  You must set the version to the version you are updating, and the
+          hash must be the hash of the version you are updating.  Date is ignored.
+        - return a URL to the new resource for that id.
+
 # Empty AWS Serverless Application Project
 
 This starter project consists of:
