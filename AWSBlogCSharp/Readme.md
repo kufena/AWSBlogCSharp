@@ -10,6 +10,8 @@ GET <root>/
 GET <root>/blog/{id}
         - gets the blog, with text, for that id.
         - added parameters (status=[true|false]) to get latest published version, or latest unpublished version.
+        - added parameters (version=<int>) for a specific version of the post.
+        - cannot have status and version - that's a bad request.
         - returns a json blog model.
 
 PUSH <root>/blog

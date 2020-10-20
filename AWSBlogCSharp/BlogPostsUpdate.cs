@@ -38,10 +38,6 @@ namespace AWSBlogCSharp
         {
             context.Logger.LogLine("Update Request\n");
             APIGatewayProxyResponse response;
-
-            foreach(var key in request.Headers.Keys) {
-                Console.WriteLine($"Header:: {key} -> {request.Headers[key]}");
-            }
             Console.WriteLine(request);
             Console.WriteLine("Request body:::" + request.Body);
 
@@ -114,7 +110,7 @@ namespace AWSBlogCSharp
 
             response = new APIGatewayProxyResponse {
                         StatusCode = (int)HttpStatusCode.OK,
-                        Body = "{ \"URL\": \"/blog/" + $"{id}" + "\" }",
+                        Body = "{ \"URL\": \"/blog/" + $"{id}?version={newVersion}" + "\" }",
                         Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         

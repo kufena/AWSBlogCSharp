@@ -23,7 +23,7 @@ namespace AWSBlogCSharp
     class BlogPostsGetById
     {
 
-        Dictionary<string,string>secrets;
+        Dictionary<string, string> secrets;
         BlogPostContext bpc;
 
         public BlogPostsGetById()
@@ -43,63 +43,112 @@ namespace AWSBlogCSharp
             APIGatewayProxyResponse response;
 
             string idStr = request.PathParameters["id"];
+
+            int id = 0;
+            if (!Int32.TryParse(idStr, out id))
             {
-                int id = 0;
-                if (!Int32.TryParse(idStr, out id))
+                response = new APIGatewayProxyResponse
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Body = "Illegal parameter " + id,
+                    Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
+                };
+            }
+            else
+            {
+                bool statusClause = false;
+                bool statusStr = false;
+                bool versionClause = false;
+                int selectVersion = 0;
+
+                if (!(request.QueryStringParameters is null))
+                {
+                    if (request.QueryStringParameters.ContainsKey("status"))
+                    {
+                        if (!Boolean.TryParse(request.QueryStringParameters["status"], out statusStr))
+                            return new APIGatewayProxyResponse
+                            {
+                                StatusCode = (int)HttpStatusCode.BadRequest,
+                                Body = "{ \"error\":\"Bad status parameter\"}"
+                            };
+                        statusClause = true;
+                        context.Logger.LogLine("Selection with status = " + statusStr);
+                    }
+
+                    if (request.QueryStringParameters.ContainsKey("version"))
+                    {
+                        if (!Int32.TryParse(request.QueryStringParameters["version"], out selectVersion))
+                            return new APIGatewayProxyResponse
+                            {
+                                StatusCode = (int)HttpStatusCode.BadRequest,
+                                Body = "Poor choice of version."
+                            };
+                        versionClause = true;
+                        context.Logger.LogLine("Selecting version " + selectVersion);
+                    }
+                }
+
+                if (statusClause && versionClause)
+                {
+                    return new APIGatewayProxyResponse
+                    {
+                        StatusCode = (int)HttpStatusCode.BadRequest,
+                        Body = "Can't have both status and version clause when choosing."
+                    };
+                }
+                
+                DBBlogPost latest = null;
+
+                if (statusClause)
+                {
+                    var versions = from blog in bpc.BlogPost where (blog.Id == id) && (blog.Status == statusStr) orderby blog.Version descending select blog;
+                    if (versions.Count() != 0) latest = versions.First();
+                }
+                else
+                {
+                    if (versionClause)
+                    {
+                        var versions = from blog in bpc.BlogPost where (blog.Id == id) && (blog.Version == selectVersion) select blog;
+                        if (versions.Count() != 0) latest = versions.First();
+                    }
+                    else
+                    {
+                        var versions = from blog in bpc.BlogPost where (blog.Id == id) orderby blog.Version descending select blog;
+                        if (versions.Count() != 0) latest = versions.First();
+                    }
+                }
+
+                if (latest is null)
                 {
                     response = new APIGatewayProxyResponse
                     {
-                        StatusCode = (int)HttpStatusCode.BadRequest,
-                        Body = "Illegal parameter " + id,
-                        Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Body = "",
+                        Headers = new Dictionary<string, string> { }
                     };
                 }
                 else
                 {
-                    bool statusClause = false;
-                    bool statusStr = false;
-                    if (request.PathParameters.ContainsKey("status")) {
-                        if (!Boolean.TryParse(request.PathParameters["status"], out statusStr))
-                            return new APIGatewayProxyResponse {
-                                StatusCode = (int) HttpStatusCode.BadRequest,
-                                Body = "{ \"error\":\"Bad status parameter\"}"
-                            };
-                        statusClause = true;
-                    }
-                    IOrderedQueryable<DBBlogPost> versions;
-                    if (statusClause)
-                        versions = from blog in bpc.BlogPost where (blog.Id == id) && (blog.Status == statusStr) orderby blog.Version descending select blog;
-                    else
-                        versions = from blog in bpc.BlogPost where (blog.Id == id) orderby blog.Version descending select blog;
-                    
-                    if (versions.Count() == 0)
-                    {
-                        response = new APIGatewayProxyResponse
-                        {
-                            StatusCode = (int)HttpStatusCode.NotFound,
-                            Body = "",
-                            Headers = new Dictionary<string, string> { }
-                        };
-                    }
-                    else
-                    {
-                        var latest = versions.First();
-                        AmazonS3Client s3client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
-                        //var resp = await s3client.GetObjectAsync(secrets["blogstore"], "/" + latest.File);
-                        var resp = await s3client.GetObjectAsync(new GetObjectRequest { BucketName = "thegatehousewereham.blogposts", Key = latest.File});
-                        var outstream = new StreamReader(resp.ResponseStream);
-                        var text = outstream.ReadToEnd();
-                        var model = new BlogPostModel(latest.Version,latest.Title,latest.Date, text, latest.Status, latest.Hash);
-                        response = new APIGatewayProxyResponse
-                        {
-                            StatusCode = (int)HttpStatusCode.OK,
-                            Body = JsonSerializer.Serialize<BlogPostModel>(model),
-                            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
-                        };
-                    }
-                }
+                    // Fetch file from S3
+                    AmazonS3Client s3client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);
+                    var resp = await s3client.GetObjectAsync(new GetObjectRequest { BucketName = secrets["blogstore"], Key = latest.File });
+                    var outstream = new StreamReader(resp.ResponseStream);
+                    var text = outstream.ReadToEnd();
 
+                    // Create model
+                    var model = new BlogPostModel(latest.Version, latest.Title, latest.Date, text, latest.Status, latest.Hash);
+                    
+                    // Return response
+                    response = new APIGatewayProxyResponse
+                    {
+                        StatusCode = (int)HttpStatusCode.OK,
+                        Body = JsonSerializer.Serialize<BlogPostModel>(model),
+                        Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
+                    };
+                }
             }
+
+
             return response;
         }
     }

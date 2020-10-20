@@ -38,27 +38,49 @@ namespace AWSBlogCSharp
         {
             // ToDo: Not sure this is the best way to do this - probalby ought to use a DI framework.
             context.Logger.LogLine("Get ALL Request\n");
-            bool statusClause = false;
-            bool statusStr = false;
-            if (request.PathParameters.ContainsKey("status")) {
-                if (!Boolean.TryParse(request.PathParameters["status"], out statusStr))
-                    return new APIGatewayProxyResponse {
-                        StatusCode = (int) HttpStatusCode.BadRequest,
-                        Body = "{ \"error\":\"Bad status parameter\"}"
-                    };
-                statusClause = true;
+            //bool statusClause = false;
+            //bool statusStr = false;
+            //if (request.QueryStringParameters.ContainsKey("status")) {
+            //    if (!Boolean.TryParse(request.PathParameters["status"], out statusStr))
+            //        return new APIGatewayProxyResponse {
+            //            StatusCode = (int) HttpStatusCode.BadRequest,
+            //            Body = "{ \"error\":\"Bad status parameter\"}"
+            //        };
+            //statusClause = true;
+            //}
+            //IOrderedQueryable<DBBlogPost> versions;
+
+            //if (statusClause)
+
+            //var versions2 = (from blog in bpc.BlogPost
+            //                group blog by blog.Id into g
+            //                select new
+            //                {
+            //                    Id = g.Key,
+            //                    Version = (from t in g select t.Version).Max()
+            //                }).ToList();
+
+            var versions = from blog in bpc.BlogPost
+                             group blog by blog.Id into g
+                             select new { Id = g.Key, Version = g.Max(x => x.Version) };
+
+
+            List<BlogPostURL> all = new List<BlogPostURL>();
+            foreach(var x in versions) {
+                all.Add(new BlogPostURL($"/blog/{x.Id}?version={x.Version}"));
             }
-            IOrderedQueryable<DBBlogPost> versions;
-            if (statusClause)
-                versions = from blog in bpc.BlogPost where (blog.Status == statusStr) orderby blog.Version descending select blog;
-            else
-                versions = from blog in bpc.BlogPost orderby blog.Version descending select blog;
+                                                       //from blog in bpc.BlogPost where (blog.Status == statusStr) orderby blog.Version descending select blog;
+            //else
+            //    versions = from blog in bpc.BlogPost group blog by blog.Id into g 
+            //                select new BlogPostModel { Id = blog.Id, 
+            //                                           Version = (from t in g select t.Version).Max()};
+                                          //from blog in bpc.BlogPost orderby blog.Version descending select blog;
             
             return new APIGatewayProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = "{ \"fred\": \"All the posts from the fair. \" }",
-                Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
+                Body = System.Text.Json.JsonSerializer.Serialize<List<BlogPostURL>>(all),
+                Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
     }
