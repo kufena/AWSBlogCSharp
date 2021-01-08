@@ -28,7 +28,8 @@ namespace AWSBlogCSharp
         public BlogPostsCreate()
         {
             secrets = GetSecrets.GetSecretsDictionary();
-            bpc = GetConnectionString.GetContext(secrets);  
+            string connstr = GetSecrets.GetSecretConnectionString();
+            bpc = GetConnectionString.GetContext(connstr);  
         }
         
         /// <summary>

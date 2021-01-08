@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Data.Common;
 using Amazon;
 using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
@@ -31,10 +32,16 @@ namespace AWSBlogCSharp
         /*
          * AWSSDK.SecretsManager version="3.3.0" targetFramework="net45"
          */
-        public static BlogPostContext GetContext(Dictionary<string,string> secrets)
+        public static BlogPostContext GetContext(string secrets)
         {
             var options = new DbContextOptionsBuilder<BlogPostContext>();
-            options.UseMySQL(secrets["connectionstring"]);
+            var secretJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(secrets);
+            string host = secretJson["host"];
+            string uid = secretJson["username"];
+            string pwd = secretJson["password"];
+            string port = secretJson["port"];
+            string connstring = $"Server={host};Port={port};Database=GateHouseWerehamBlog;Uid={uid};Pwd={pwd};";
+            options.UseMySQL(connstring);
             return new BlogPostContext(options.Options);
         }
     }
