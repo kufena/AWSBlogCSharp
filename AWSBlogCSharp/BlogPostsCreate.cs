@@ -10,7 +10,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using MySQL.Data.EntityFrameworkCore;
 using System.Text.Json;
-using AWSBlogCSharp.Model;
+using AWSBlogModel;
 using Amazon.S3;
 using System.Threading.Tasks;
 using System.Security.Cryptography;

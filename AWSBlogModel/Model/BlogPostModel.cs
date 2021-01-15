@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AWSBlogCSharp.Model
+namespace AWSBlogModel
 {
     /**
     * The point of this model is to remove the id, because on creation we don't have/know

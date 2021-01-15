@@ -172,6 +172,7 @@ namespace AWSBlogCSharp
 
             // Your code goes here.
             // Our secret is actually a JSON structure - get the blogposts.connectionstring element out of it.
+            Console.WriteLine("Blogposts secrets are::" + secret);
             var secretJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(secret);
 
             return secretJson;

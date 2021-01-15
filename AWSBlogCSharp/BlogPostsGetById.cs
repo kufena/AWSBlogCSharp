@@ -13,7 +13,7 @@ using MySQL.Data.EntityFrameworkCore;
 using System.Text.Json;
 using Amazon.S3;
 using Amazon.S3.Model;
-using AWSBlogCSharp.Model;
+using AWSBlogModel;
 using System.Threading.Tasks;
 
 //[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -138,7 +138,10 @@ namespace AWSBlogCSharp
 
                     // Create model
                     var model = new BlogPostModel(latest.Version, latest.Title, latest.Date, text, latest.Status, latest.Hash);
-                    
+
+                    foreach (var (k, v) in request.Headers)
+                        Console.WriteLine($"Header {k} with value {v}");
+
                     // Return response
                     response = new APIGatewayProxyResponse
                     {

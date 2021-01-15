@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using MySQL.Data.EntityFrameworkCore;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AWSBlogCSharp.Model;
+using AWSBlogModel;
 using Amazon.S3;
 
 //[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]

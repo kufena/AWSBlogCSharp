@@ -1,4 +1,5 @@
-namespace AWSBlogCSharp {
+namespace AWSBlogModel
+{
 
     public class BlogPostURL {
         string url;

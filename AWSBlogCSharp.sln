@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogCSharp", "AWSBlogCSh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogCSharp.Tests", "AWSBlogCSharp.Tests\AWSBlogCSharp.Tests.csproj", "{B6E862B4-F481-47C5-9854-8897DE1ED717}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogApp", "AWSBlogApp\AWSBlogApp.csproj", "{AC2D4D25-AC8E-4589-835E-801A03F5A738}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSBlogModel", "AWSBlogModel\AWSBlogModel.csproj", "{D48CF9E0-187D-4B49-AD4A-BF7A48483977}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{B6E862B4-F481-47C5-9854-8897DE1ED717}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6E862B4-F481-47C5-9854-8897DE1ED717}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6E862B4-F481-47C5-9854-8897DE1ED717}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC2D4D25-AC8E-4589-835E-801A03F5A738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC2D4D25-AC8E-4589-835E-801A03F5A738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC2D4D25-AC8E-4589-835E-801A03F5A738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC2D4D25-AC8E-4589-835E-801A03F5A738}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D48CF9E0-187D-4B49-AD4A-BF7A48483977}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48CF9E0-187D-4B49-AD4A-BF7A48483977}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D48CF9E0-187D-4B49-AD4A-BF7A48483977}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D48CF9E0-187D-4B49-AD4A-BF7A48483977}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

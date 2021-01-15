@@ -13,7 +13,7 @@ using System.Linq;
 using Amazon.S3;
 using System.Threading.Tasks;
 using System.IO;
-using AWSBlogCSharp.Model;
+using AWSBlogModel;
 
 [assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
