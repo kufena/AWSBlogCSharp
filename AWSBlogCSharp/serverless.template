@@ -3,6 +3,16 @@
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Serverless Application for a blog API.",
   "Resources": {
+    "MyApi": {
+      "Type": "AWS::Serverless::Api",
+      "Properties": {
+        "StageName": "Prod",
+        "Cors": {
+          "AllowOrigin": "'*'"
+          },
+        "DefinitionBody": ""
+        }
+    },
     "Get": {
       "Type": "AWS::Serverless::Function",
       "Properties": {

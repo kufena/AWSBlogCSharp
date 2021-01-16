@@ -1,11 +1,11 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 
-<h1>Weather forecast</h1>
+<h1>All blog posts.</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (blogposts == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -15,19 +15,17 @@ else
         <thead>
             <tr>
                 <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Title</th>
+                <th>Text</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var (id, blog) in blogposts)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@blog.Date.ToShortTimeString()</td>
+                    <td>@blog.Title</td>
+                    <td>@blog.Text.Substring(0,blog.Text.Length > 100 ? 100 : blog.Text.Length)</td>
                 </tr>
             }
         </tbody>
@@ -35,21 +33,59 @@ else
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private Dictionary<int, BlogPostModel> blogposts;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-    }
+        //HttpMessageHandler msh = new HttpClientHandler();
+        //WebRequestHandler wrh = new WebRequestHandler();
+        HttpClient hpc = new HttpClient(); // msh);
+        string url = @"https://m4cxf4xb70.execute-api.eu-west-2.amazonaws.com/Prod/";
+        /*
+        HttpRequestMessage hrm = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri(url)
+        };
+        hrm.SetBrowserRequestMode(BrowserRequestMode.Cors);
 
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
+        //hrm.Headers.Add("Access-Control-Allow-Origin", "*");
+        //hrm.Headers.Add("Origin", "https://localhost:5001");
 
-        public int TemperatureC { get; set; }
+        var thingresp = await hpc.SendAsync(hrm);
+        string thingstr = await thingresp.Content.ReadAsStringAsync();
+        */
 
-        public string Summary { get; set; }
+        string thingstr = await hpc.GetStringAsync(url);
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        //if (thingresp.StatusCode == System.Net.HttpStatusCode.OK)
+        //{
+            var things = JsonSerializer.Deserialize<BlogPostURL[]>(thingstr);
+            blogposts = new Dictionary<int, BlogPostModel>();
+            blogposts.Add(1, new BlogPostModel
+            {
+                Title = "Yep OK!",
+                Text = $"Status {thingstr.Length}",
+                Hash = "",
+                Date = DateTime.Now,
+                Status = true,
+                Version = 0
+            });
+        //}
+        //else
+        //{
+        //    blogposts = new Dictionary<int, BlogPostModel>();
+        //    blogposts.Add(1, new BlogPostModel
+        //    {
+        //        Title = "Nope, exception",
+        //        Text = $"Status {thingresp.StatusCode}",
+        //        Hash = "",
+        //        Date = DateTime.Now,
+        //        Status = true,
+        //        Version = 0
+        //    });
+        //}
+
+
     }
 }
