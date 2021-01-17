@@ -6,13 +6,19 @@
     "MyApi": {
       "Type": "AWS::Serverless::Api",
       "Properties": {
-        "StageName": "Prod",
-        "Cors": {
-          "AllowOrigin": "'*'"
-          },
-        "DefinitionBody": ""
+          "MethodSettings": [
+              {"HttpMethod":"GET", "ResourcePath": "/"},
+              {"HttpMethod":"GET", "ResourcePath": "/blog/{id}"},
+              {"HttpMethod":"POST", "ResourcePath": "/blog/"},
+              {"HttpMethod":"PUT", "ResourcePath": "/blog/{id}"}
+              ],
+          "StageName": "Prod",
+          "Cors": {
+              "AllowMethods": "'*'",
+              "AllowOrigin": "'*'"
+          }
         }
-    },
+      },
     "Get": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
@@ -33,7 +39,8 @@
             "Type": "Api",
             "Properties": {
               "Path": "/blog/{id}",
-              "Method": "GET"
+              "Method": "GET",
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -59,7 +66,8 @@
             "Type": "Api",
             "Properties": {
               "Path": "/",
-              "Method": "GET"
+              "Method": "GET",
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -85,7 +93,8 @@
             "Type": "Api",
             "Properties": {
               "Path": "/blog/",
-              "Method": "POST"
+              "Method": "POST",
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -111,18 +120,55 @@
             "Type": "Api",
             "Properties": {
               "Path": "/blog/{id}",
-              "Method": "PUT"
+              "Method": "PUT",
+              "RestApiId": "MyApi"
             }
           }
         }
       }
-    }
+    },
+    "ConfigLambdaPermissionCreate":
+      {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+         "Action" : "lambda:InvokeFunction",
+         "Principal": "*",
+         "FunctionName": {"Fn::GetAtt" : [ "Create", "Arn"]}
+        }
+      },
+    "ConfigLambdaPermissionUpdate":
+      {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+         "Action" : "lambda:InvokeFunction",
+         "Principal": "*",
+         "FunctionName": {"Fn::GetAtt" : [ "Update", "Arn"]}
+        }
+      },
+    "ConfigLambdaPermissionGet":
+      {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+         "Action" : "lambda:InvokeFunction",
+         "Principal": "*",
+         "FunctionName": {"Fn::GetAtt" : [ "Get", "Arn"]}
+        }
+      },
+    "ConfigLambdaPermissionGetAll":
+      {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+         "Action" : "lambda:InvokeFunction",
+         "Principal": "*",
+         "FunctionName": {"Fn::GetAtt" : [ "GetAll", "Arn"]}
+        }
+      }
   },
   "Outputs": {
     "ApiURL": {
       "Description": "API endpoint URL for Prod environment",
       "Value": {
-        "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+        "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
       }
     }
   }
