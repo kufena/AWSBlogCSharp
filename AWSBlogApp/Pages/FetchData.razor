@@ -23,7 +23,7 @@ else
             @foreach (var (id, blog) in blogposts)
             {
                 <tr>
-                    <td>@blog.Date.ToShortTimeString()</td>
+                    <td>@blog.Date.ToShortDateString()</td>
                     <td>@blog.Title</td>
                     <td>@blog.Text.Substring(0,blog.Text.Length > 100 ? 100 : blog.Text.Length)</td>
                 </tr>
@@ -38,12 +38,12 @@ else
     protected override async Task OnInitializedAsync()
     {
 
-        string url = @"https://glziyjk547.execute-api.eu-west-2.amazonaws.com/Prod/";
-        
+        string url = @"https://glziyjk547.execute-api.eu-west-2.amazonaws.com/Prod";
+
         HttpRequestMessage hrm = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri(url)
+            RequestUri = new Uri($"{url}/")
         };
         hrm.SetBrowserRequestMode(BrowserRequestMode.Cors);
 
@@ -52,7 +52,7 @@ else
 
         var thingresp = await Http.SendAsync(hrm);
         string thingstr = await thingresp.Content.ReadAsStringAsync();
-        
+
 
         //string thingstr = await hpc.GetStringAsync(url);
 
@@ -60,15 +60,16 @@ else
         {
             var things = JsonSerializer.Deserialize<BlogPostURL[]>(thingstr);
             blogposts = new Dictionary<int, BlogPostModel>();
-            blogposts.Add(1, new BlogPostModel
+            foreach (var blogurl in things)
             {
-                Title = "Yep OK!",
-                Text = $"Status {thingstr.Length}",
-                Hash = "",
-                Date = DateTime.Now,
-                Status = true,
-                Version = 0
-            });
+                var model = await Http.GetFromJsonAsync<BlogPostModel>(url + blogurl.URL);
+                Uri rui = new Uri(url + blogurl.URL);
+                var path = rui.LocalPath;
+                int lio = path.LastIndexOf('/');
+                var idstr = path.Substring(lio+1);
+                int id = Int32.Parse(idstr);
+                blogposts.Add(id, model);
+            }
         }
         else
         {
