@@ -83,7 +83,7 @@ namespace AWSBlogCSharp
                 StatusCode = (int)HttpStatusCode.OK,
                 Body = System.Text.Json.JsonSerializer.Serialize<List<BlogPostURL>>(all),
                 Headers = new Dictionary<string, string> {   { "Content-Type", "application/json" } 
-                                                         //  , { "Access-Control-Allow-Origin" , "*" }
+                                                           , { "Access-Control-Allow-Origin" , "*" }
                                                          }
             };
         }

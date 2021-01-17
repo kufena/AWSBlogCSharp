@@ -52,7 +52,8 @@ namespace AWSBlogCSharp
                 {
                     StatusCode = (int)HttpStatusCode.BadRequest,
                     Body = "Illegal parameter " + id,
-                    Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
+                    Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" }
+                                                           , { "Access-Control-Allow-Origin" , "*" } }
                 };
             }
             else
@@ -125,7 +126,7 @@ namespace AWSBlogCSharp
                     {
                         StatusCode = (int)HttpStatusCode.NotFound,
                         Body = "",
-                        Headers = new Dictionary<string, string> { }
+                        Headers = new Dictionary<string, string> { { "Access-Control-Allow-Origin" , "*" } }
                     };
                 }
                 else
@@ -147,7 +148,8 @@ namespace AWSBlogCSharp
                     {
                         StatusCode = (int)HttpStatusCode.OK,
                         Body = JsonSerializer.Serialize<BlogPostModel>(model),
-                        Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
+                        Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
+                                                                 , { "Access-Control-Allow-Origin" , "*" } }
                     };
                 }
             }

@@ -100,7 +100,8 @@ namespace AWSBlogCSharp
                 response = new APIGatewayProxyResponse {
                             StatusCode = (int)HttpStatusCode.OK,
                             Body = "{ \"URL\": \"/blog/" + $"{id}" + "\" }",
-                            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
+                            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
+                                                           , { "Access-Control-Allow-Origin" , "*" }}
                 };
             }
             return response;
