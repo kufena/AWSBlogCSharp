@@ -1,0 +1,28 @@
+﻿@page "/displaypage/{url}"
+@inject HttpClient Http
+
+@if (model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>@model.Title</h1>
+    <h3>@model.Date.ToLongDateString()</h3>
+    <p>
+    @model.Text
+    </p>
+}
+
+@code {
+    [Parameter]
+    public string url { get; set; }
+
+    private BlogPostModel model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = await Http.GetFromJsonAsync<BlogPostModel>(url);
+
+    }
+}
