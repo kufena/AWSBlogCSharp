@@ -62,22 +62,43 @@ namespace AWSBlogCSharp
             //                    Version = (from t in g select t.Version).Max()
             //                }).ToList();
 
-            var versions = from blog in bpc.BlogPost
-                             group blog by blog.Id into g
-                             select new { Id = g.Key, Version = g.Max(x => x.Version) };
+            var versions = (from blog in bpc.BlogPost
+                            group blog by blog.Id into g
+                            select new { Id = g.Key, Version = g.Max(x => x.Version) });
+
+            Dictionary<int, int> versionslist = new Dictionary<int, int>();
+            foreach (var x in versions) versionslist.Add(x.Id, x.Version);
+
+            var data = (from blog in bpc.BlogPost
+                        select new { Id = blog.Id, Version = blog.Version, Title = blog.Title, File = blog.File, Date = blog.Date })
+                        .ToList()
+                        .Where(blog => versionslist[blog.Id] == blog.Version);
 
 
-            List<BlogPostURL> all = new List<BlogPostURL>();
-            foreach(var x in versions) {
-                all.Add(new BlogPostURL($"/blog/{x.Id}?version={x.Version}"));
+
+            List< BlogPostURL > all = new List<BlogPostURL>();
+//            foreach (var x in versions)
+//            {
+//                all.Add(new BlogPostURL($"/blog/{x.Id}?version={x.Version}"));
+//            }
+            foreach (var x in data)
+            {
+                all.Add(new BlogPostURL
+                {
+                    URL = $"/blog/{x.Id}?version={x.Version}",
+                    Title = x.Title,
+                    Id = x.Id,
+                    Version = x.Version,
+                    Date = x.Date
+                });
             }
-                                                       //from blog in bpc.BlogPost where (blog.Status == statusStr) orderby blog.Version descending select blog;
+            //from blog in bpc.BlogPost where (blog.Status == statusStr) orderby blog.Version descending select blog;
             //else
             //    versions = from blog in bpc.BlogPost group blog by blog.Id into g 
             //                select new BlogPostModel { Id = blog.Id, 
             //                                           Version = (from t in g select t.Version).Max()};
-                                          //from blog in bpc.BlogPost orderby blog.Version descending select blog;
-            
+            //from blog in bpc.BlogPost orderby blog.Version descending select blog;
+
             return new APIGatewayProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,

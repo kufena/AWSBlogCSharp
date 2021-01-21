@@ -26,7 +26,6 @@ else
                 <tr>
                     <td>@blog.Date.ToShortDateString()</td>
                     <td>@blog.Title</td>
-                    <td>@blog.Text.Substring(0, blog.Text.Length > 100 ? 100 : blog.Text.Length)</td>
                     <td><button @onclick="@(() => NavigateToCounterComponent(id))">View</button></td>
                 </tr>
             }
@@ -35,66 +34,19 @@ else
 }
 
 @code {
-    private Dictionary<int, BlogPostModel> blogposts;
-    private Dictionary<int, string> blogurls;
+    private Dictionary<int, BlogPostURL> blogposts;
 
     public void NavigateToCounterComponent(int id)
     {
-        Navigation.NavigateTo($"counter/{blogurls[id]}");
+        Navigation.NavigateTo($"displaypage/{id}");
     }
 
     protected override async Task OnInitializedAsync()
     {
 
         string url = @"https://46ha4j1ih3.execute-api.eu-west-2.amazonaws.com/Prod/";
-
-        HttpRequestMessage hrm = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri($"{url}/")
-        };
-        hrm.SetBrowserRequestMode(BrowserRequestMode.Cors);
-
-        //hrm.Headers.Add("Access-Control-Allow-Origin", "*");
-        hrm.Headers.Add("Origin", "https://localhost:5001");
-
-        var thingresp = await Http.SendAsync(hrm);
-        string thingstr = await thingresp.Content.ReadAsStringAsync();
-
-
-        //string thingstr = await hpc.GetStringAsync(url);
-
-        if (thingresp.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            var things = JsonSerializer.Deserialize<BlogPostURL[]>(thingstr);
-            blogposts = new Dictionary<int, BlogPostModel>();
-            blogurls = new Dictionary<int, string>();
-            foreach (var blogurl in things)
-            {
-                var model = await Http.GetFromJsonAsync<BlogPostModel>(url + blogurl.URL);
-                Uri rui = new Uri(url + blogurl.URL);
-                var path = rui.LocalPath;
-                int lio = path.LastIndexOf('/');
-                var idstr = path.Substring(lio + 1);
-                int id = Int32.Parse(idstr);
-                blogposts.Add(id, model);
-                blogurls.Add(id, url + blogurl.URL);
-            }
-        }
-        else
-        {
-            blogposts = new Dictionary<int, BlogPostModel>();
-            blogposts.Add(1, new BlogPostModel
-            {
-                Title = "Nope, exception",
-                Text = $"Status {thingresp.StatusCode}",
-                Hash = "",
-                Date = DateTime.Now,
-                Status = true,
-                Version = 0
-            });
-        }
-
-
+        blogposts = new Dictionary<int, BlogPostURL>();
+        var blogs = await Http.GetFromJsonAsync<BlogPostURL[]>(url);
+        foreach (var b in blogs) blogposts.Add(b.Id, b);
     }
 }
