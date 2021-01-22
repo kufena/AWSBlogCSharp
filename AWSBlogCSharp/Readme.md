@@ -23,6 +23,10 @@ PUT <root>/blog/id
           hash must be the hash of the version you are updating.  Date is ignored.
         - return a URL to the new resource for that id.
 
+Deploy using this command:
+
+    dotnet lambda deploy-serverless GateHouseWerehamBlog --s3-bucket thegatehousewereham.home -tp "EmailSourceArn=EmailSourceArn;EmailReplyToAddress=EmailReplyToAddress"
+
 # Empty AWS Serverless Application Project
 
 This starter project consists of:

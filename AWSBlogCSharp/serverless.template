@@ -2,12 +2,26 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Serverless Application for a blog API.",
+  "Parameters" : {
+    "EmailSourceArn": {
+      "Type" : "AWS::SSM::Parameter::Value<String>",
+      "Description" : "Arn of Email SES address"
+    },
+    "EmailReplyToAddress": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Description": "reply to email address from parameter store."
+    }
+  },
   "Resources": {
     "BlogPostUserPool": {
       "Type": "AWS::Cognito::UserPool",
-      "DeletionPolicy" : "Delete"
+      "DeletionPolicy" : "Delete",
       "Properties": {
        "UserPoolName" : "BlogPostUserPool",
+       "EmailConfiguration" : {
+          "EmailSendingAccount" :  "DEVELOPER",
+          "SourceArn" : { "Ref" : "EmailSourceArn" }
+        },
         "UsernameAttributes" : ["email"],
         "Policies" : {
          "PasswordPolicy" : {
