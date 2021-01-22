@@ -47,7 +47,7 @@
         var userPool = new CognitoUserPool(poolID, clientID, provider);
 
         var useratts = new Dictionary<string, string>();
-        useratts.Add("Nickname", nickname);
+        useratts.Add("nickname", nickname);
 
         //var user = new CognitoUser(email, clientID, userPool, provider, null, null, null, useratts);
 
@@ -58,7 +58,7 @@
         //    Password = password,
         //}).ConfigureAwait(false);
 
-        await userPool.SignUpAsync(email, password, attributes, new Dictionary<string,string>());
+        await userPool.SignUpAsync(email, password, useratts, new Dictionary<string,string>());
         Console.WriteLine("Done sign up async.");
     }
 
@@ -82,7 +82,7 @@
     {
         var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
         var userPool = new CognitoUserPool(poolID, clientID, provider);
-        var user = new CognitoUser(email, "clientID", userPool, provider);
+        var user = new CognitoUser(email, clientID, userPool, provider);
 
         AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
         {

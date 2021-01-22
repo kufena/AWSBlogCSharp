@@ -46,7 +46,9 @@ else
 
         string url = @"https://9kw03scz06.execute-api.eu-west-2.amazonaws.com/Prod/";
         blogposts = new Dictionary<int, BlogPostURL>();
-        var blogs = await Http.GetFromJsonAsync<BlogPostURL[]>(url);
+        var blogstr = await Http.GetStringAsync(url);
+        //Http.GetFromJsonAsync<BlogPostURL[]>(url);
+        var blogs = JsonSerializer.Deserialize<BlogPostURL[]>(blogstr);
         foreach (var b in blogs) blogposts.Add(b.Id, b);
     }
 }
