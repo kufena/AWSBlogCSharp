@@ -3,6 +3,47 @@
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Serverless Application for a blog API.",
   "Resources": {
+    "BlogPostUserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "DeletionPolicy" : "Delete"
+      "Properties": {
+       "UserPoolName" : "BlogPostUserPool",
+        "UsernameAttributes" : ["email"],
+        "Policies" : {
+         "PasswordPolicy" : {
+          "MinimumLength" : 9,
+          "RequireLowercase" : true,
+          "RequireUppercase": true,
+          "RequireNumbers" : true,
+          "RequireSymbols" : false,
+          "TemporaryPasswordValidityDays" : 7
+          }
+        },
+        "AdminCreateUserConfig" : {
+            "AllowAdminCreateUserOnly" : false
+        },
+        "Schema" : [ 
+                    {
+                    "Name" : "email",
+                    "AttributeDataType" : "String",
+                    "Required": true
+                    },
+                    {
+                      "Name" : "nickname",
+                      "AttributeDataType": "String",
+                      "Required": true
+                    }
+                   ]
+       }
+    },
+    "BlogPostUserPoolClient": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+       "UserPoolId" : { "Ref" : "BlogPostUserPool" },
+       "ClientName" : "BlogPostUserPoolClient",
+       "GenerateSecret" : false
+      }
+    },
     "MyApi": {
       "Type": "AWS::Serverless::Api",
       "Properties": {
@@ -16,11 +57,19 @@
           "Cors": {
               "AllowMethods": "'*'",
               "AllowOrigin": "'*'"
+          },
+          "Auth" : {
+             "Authorizers": {
+               "MyAuthorizer": {
+                 "UserPoolArn": {"Fn::GetAtt" : [ "BlogPostUserPool","Arn"]}
+               }
+             },
+             "DefaultAuthorizer": "MyAuthorizer"
           }
         }
       },
     "Get": {
-      "Type": "AWS::Serverless::Function",
+      "Type": "AWS::Serverless::Function",      
       "Properties": {
         "Handler": "AWSBlogCSharp::AWSBlogCSharp.BlogPostsGetById::Get",
         "Runtime": "dotnetcore3.1",
@@ -40,7 +89,10 @@
             "Properties": {
               "Path": "/blog/{id}",
               "Method": "GET",
-              "RestApiId": "MyApi"
+              "RestApiId": "MyApi",
+              "Auth" : {
+                "Authorizer" : "MyAuthorizer"
+                }
             }
           }
         }
@@ -67,7 +119,10 @@
             "Properties": {
               "Path": "/",
               "Method": "GET",
-              "RestApiId": "MyApi"
+              "RestApiId": "MyApi",
+              "Auth" : {
+                "Authorizer" : "MyAuthorizer"
+                }
             }
           }
         }
@@ -94,7 +149,10 @@
             "Properties": {
               "Path": "/blog/",
               "Method": "POST",
-              "RestApiId": "MyApi"
+              "RestApiId": "MyApi",
+              "Auth" : {
+                "Authorizer" : "MyAuthorizer"
+                }
             }
           }
         }
@@ -121,7 +179,10 @@
             "Properties": {
               "Path": "/blog/{id}",
               "Method": "PUT",
-              "RestApiId": "MyApi"
+              "RestApiId": "MyApi",
+              "Auth" : {
+                "Authorizer" : "MyAuthorizer"
+                }
             }
           }
         }
@@ -170,6 +231,14 @@
       "Value": {
         "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
       }
+    },
+    "UserPoolId": {
+      "Description": "User Pool Id",
+      "Value": {"Fn::Sub": "${BlogPostUserPool}"}
+    },
+    "UserPoolClientId": {
+      "Description": "App Client Id",
+      "Value": {"Fn::Sub": "${BlogPostUserPoolClient}"}
     }
   }
 }
