@@ -18,10 +18,17 @@
       "DeletionPolicy" : "Delete",
       "Properties": {
        "UserPoolName" : "BlogPostUserPool",
+       "AccountRecoverySetting" : {
+         "RecoveryMechanisms" : [
+         {
+           "Name" : "verified_email",
+           "Priority" : 1
+         }]
+       },
        "EmailConfiguration" : {
-          "EmailSendingAccount" :  "DEVELOPER",
-          "SourceArn" : { "Ref" : "EmailSourceArn" }
+          "EmailSendingAccount" : "COGNITO_DEFAULT"
         },
+        "AutoVerifiedAttributes" : ["email"],
         "UsernameAttributes" : ["email"],
         "Policies" : {
          "PasswordPolicy" : {
@@ -53,9 +60,9 @@
     "BlogPostUserPoolClient": {
       "Type": "AWS::Cognito::UserPoolClient",
       "Properties": {
-       "UserPoolId" : { "Ref" : "BlogPostUserPool" },
-       "ClientName" : "BlogPostUserPoolClient",
-       "GenerateSecret" : false
+        "UserPoolId" : { "Ref" : "BlogPostUserPool" },
+        "ClientName" : "BlogPostUserPoolClient",
+        "GenerateSecret" : false
       }
     },
     "MyApi": {
