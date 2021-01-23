@@ -10,23 +10,28 @@
 <h3>SignUp</h3>
 <p>
     Register Here::
-    <br /><input type="text" @bind="email" name="Email:" />
-    <br /><input type="password" @bind="password" name="Password:" />
-    <br /><input type="text" @bind="nickname" name="Nickname:" />
+    <br />Email: <input type="text" @bind="email" name="Email:" />
+    <br />Password: <input type="password" @bind="password" name="Password:" />
+    <br />Nickname: <input type="text" @bind="nickname" name="Nickname:" />
     <br /><button @onclick="Register">Register</button>
 </p>
 
 <p>
     Code::
-    <br /><input type="text" @bind="email" name="Email:" />
-    <br /><input type="text" @bind="code" name="Code:" />
+    <br />Email: <input type="text" @bind="email" name="Email:" />
+    <br />Code: <input type="text" @bind="code" name="Code:" />
     <br /><button @onclick="Confirm">Confirm Registration</button>
 </p>
 <p>
     Sign in::
-    <br /><input type="text" @bind="email" name="Email:" />
-    <br /><input type="password" @bind="password" name="Password:" />
+    <br />Email: <input type="text" @bind="email" name="Email:" />
+    <br />Password: <input type="password" @bind="password" name="Password:" />
     <br /><button @onclick="SignIn">Sign In</button>
+    <br /><button @onclick="LogOut">Log Out</button>
+</p>
+
+<p>
+    <button @onclick="What">What!</button>
 </p>
 
 @code {
@@ -36,10 +41,12 @@
     string nickname = "";
     string code = "";
 
+    AuthFlowResponse authResponse = null;
+
     string poolID = "eu-west-2_hGK5FwHmn";
     string clientID = "19udg9c24g468mgekd78062k3d";
 
-///ApiURL                         https://orh9kbmtva.execute-api.eu-west-2.amazonaws.com/Prod/
+    ///ApiURL                         https://orh9kbmtva.execute-api.eu-west-2.amazonaws.com/Prod/
 
     private async void Register()
     {
@@ -49,17 +56,16 @@
         var useratts = new Dictionary<string, string>();
         useratts.Add("nickname", nickname);
 
-        //var user = new CognitoUser(email, clientID, userPool, provider, null, null, null, useratts);
-
         Console.WriteLine($"Adding user {email} nickname {nickname}");
-
-        //AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
-        //{
-        //    Password = password,
-        //}).ConfigureAwait(false);
-
-        await userPool.SignUpAsync(email, password, useratts, new Dictionary<string,string>());
-        Console.WriteLine("Done sign up async.");
+        try
+        {
+            await userPool.SignUpAsync(email, password, useratts, new Dictionary<string, string>());
+            Console.WriteLine("Done sign up async.");
+        } catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong.");
+            Console.WriteLine(e.ToString());
+        }
     }
 
 
@@ -84,9 +90,67 @@
         var userPool = new CognitoUserPool(poolID, clientID, provider);
         var user = new CognitoUser(email, clientID, userPool, provider);
 
-        AuthFlowResponse authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
+        authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
         {
             Password = password
         }).ConfigureAwait(false);
+
+        Statics.access_token = authResponse.AuthenticationResult.AccessToken;
+        Statics.id_token = authResponse.AuthenticationResult.IdToken;
+        Statics.refresh_token = authResponse.AuthenticationResult.RefreshToken;
+    }
+
+    private void What()
+    {
+        var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
+        var userPool = new CognitoUserPool(poolID, clientID, provider);
+        try
+        {
+            var currentuser = userPool.GetUser();
+            Console.WriteLine($"{currentuser.Username} {currentuser.UserID}");
+            if (authResponse != null)
+            {
+                Console.WriteLine($"Should be ok = we are logged in!");
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine("Exception!");
+            Console.WriteLine(e.ToString());
+        }
+    }
+
+    private async void LogOut()
+    {
+        var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
+        var userPool = new CognitoUserPool(poolID, clientID, provider);
+
+        if (authResponse == null)
+        {
+            Console.WriteLine("Not logged in");
+            return;
+        }
+
+        var response = await provider.GetUserAsync(new GetUserRequest
+        {
+            AccessToken = authResponse.AuthenticationResult.AccessToken
+        });
+        Console.WriteLine($"User :: {response.Username}");
+        var atts = response.UserAttributes;
+        foreach(var att in atts)
+        {
+            Console.WriteLine($"{att.Name} to {att.Value}");
+        }
+        var soresp = await provider.GlobalSignOutAsync(new GlobalSignOutRequest
+        {
+            AccessToken = authResponse.AuthenticationResult.AccessToken
+        });
+        Console.WriteLine($"Response of signout:: {soresp.HttpStatusCode}");
+        Console.WriteLine($"{soresp.ResponseMetadata.ToString()}");
+
+        if (soresp.HttpStatusCode == System.Net.HttpStatusCode.OK)
+        {
+            authResponse = null;
+        }
     }
 }

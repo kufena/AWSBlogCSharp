@@ -1,5 +1,4 @@
 ﻿@page "/fetchdata"
-@inject HttpClient Http
 @inject NavigationManager Navigation
 
 <h1>All blog posts.</h1>
@@ -44,11 +43,24 @@ else
     protected override async Task OnInitializedAsync()
     {
 
-        string url = @"https://yrkiivndoh.execute-api.eu-west-2.amazonaws.com/Prod/";
+        string url = @"https://eivhxb9uc1.execute-api.eu-west-2.amazonaws.com/Prod/";
         blogposts = new Dictionary<int, BlogPostURL>();
-        var blogstr = await Http.GetStringAsync(url);
-        //Http.GetFromJsonAsync<BlogPostURL[]>(url);
-        var blogs = JsonSerializer.Deserialize<BlogPostURL[]>(blogstr);
-        foreach (var b in blogs) blogposts.Add(b.Id, b);
+        HttpRequestMessage hrm = new HttpRequestMessage
+        {
+            RequestUri = new Uri(url)
+        };
+        hrm.Headers.Add("Authorization", Statics.id_token);
+        var hufflepuff = new HttpClient(new HttpClientHandler());
+        var response = await hufflepuff.SendAsync(hrm);
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var blogstr = await response.Content.ReadAsStringAsync();
+            var blogs = JsonSerializer.Deserialize<BlogPostURL[]>(blogstr);
+            foreach (var b in blogs) blogposts.Add(b.Id, b);
+        }
+        else
+        {
+            Console.WriteLine($"Expected better.  {response.StatusCode} {response.ReasonPhrase} {response.RequestMessage}");
+        }
     }
 }
