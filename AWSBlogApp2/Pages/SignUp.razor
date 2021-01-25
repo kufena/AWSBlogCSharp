@@ -41,17 +41,12 @@
     string nickname = "";
     string code = "";
 
-    AuthFlowResponse authResponse = null;
 
-    string poolID = "eu-west-2_hGK5FwHmn";
-    string clientID = "19udg9c24g468mgekd78062k3d";
-
-    ///ApiURL                         https://orh9kbmtva.execute-api.eu-west-2.amazonaws.com/Prod/
 
     private async void Register()
     {
         var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(poolID, clientID, provider);
+        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
 
         var useratts = new Dictionary<string, string>();
         useratts.Add("nickname", nickname);
@@ -72,9 +67,9 @@
     private async void Confirm()
     {
         var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(poolID, clientID, provider);
+        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
 
-        var user = new CognitoUser(email, clientID, userPool, provider);
+        var user = new CognitoUser(email, Statics.clientID, userPool, provider);
 
         Console.WriteLine($"Adding user {email} confirmation");
 
@@ -87,28 +82,42 @@
     private async void SignIn()
     {
         var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(poolID, clientID, provider);
-        var user = new CognitoUser(email, clientID, userPool, provider);
+        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
+        var user = new CognitoUser(email, Statics.clientID, userPool, provider);
 
-        authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
+        Statics.authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
         {
             Password = password
         }).ConfigureAwait(false);
 
-        Statics.access_token = authResponse.AuthenticationResult.AccessToken;
-        Statics.id_token = authResponse.AuthenticationResult.IdToken;
-        Statics.refresh_token = authResponse.AuthenticationResult.RefreshToken;
+        Statics.access_token = Statics.authResponse.AuthenticationResult.AccessToken;
+        Statics.id_token = Statics.authResponse.AuthenticationResult.IdToken;
+        Statics.refresh_token = Statics.authResponse.AuthenticationResult.RefreshToken;
+
+        var myidtoken = new JwtSecurityToken(Statics.id_token);
+        var myaccesstoken = new JwtSecurityToken(Statics.access_token);
+        Console.WriteLine(myidtoken);
+        Console.WriteLine(myaccesstoken);
+
+        var credentials = new CognitoAWSCredentials(Statics.identityPoolID, RegionEndpoint.EUWest2);
+
+        var providername = $"cognito-idp.{RegionEndpoint.EUWest2.SystemName}.amazonaws.com/{Statics.poolID}";
+        Console.WriteLine(providername);
+        credentials.AddLogin(providername, Statics.id_token);
+        var creds = credentials.GetCredentials();
+        Console.WriteLine(creds);
+
     }
 
     private void What()
     {
         var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(poolID, clientID, provider);
+        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
         try
         {
             var currentuser = userPool.GetUser();
             Console.WriteLine($"{currentuser.Username} {currentuser.UserID}");
-            if (authResponse != null)
+            if (Statics.authResponse != null)
             {
                 Console.WriteLine($"Should be ok = we are logged in!");
             }
@@ -123,9 +132,9 @@
     private async void LogOut()
     {
         var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(poolID, clientID, provider);
+        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
 
-        if (authResponse == null)
+        if (Statics.authResponse == null)
         {
             Console.WriteLine("Not logged in");
             return;
@@ -133,7 +142,7 @@
 
         var response = await provider.GetUserAsync(new GetUserRequest
         {
-            AccessToken = authResponse.AuthenticationResult.AccessToken
+            AccessToken = Statics.authResponse.AuthenticationResult.AccessToken
         });
         Console.WriteLine($"User :: {response.Username}");
         var atts = response.UserAttributes;
@@ -143,14 +152,14 @@
         }
         var soresp = await provider.GlobalSignOutAsync(new GlobalSignOutRequest
         {
-            AccessToken = authResponse.AuthenticationResult.AccessToken
+            AccessToken = Statics.authResponse.AuthenticationResult.AccessToken
         });
         Console.WriteLine($"Response of signout:: {soresp.HttpStatusCode}");
         Console.WriteLine($"{soresp.ResponseMetadata.ToString()}");
 
         if (soresp.HttpStatusCode == System.Net.HttpStatusCode.OK)
         {
-            authResponse = null;
+            Statics.authResponse = null;
         }
     }
 }

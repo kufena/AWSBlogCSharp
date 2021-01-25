@@ -2,16 +2,6 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Serverless Application for a blog API.",
-  "Parameters" : {
-    "EmailSourceArn": {
-      "Type" : "AWS::SSM::Parameter::Value<String>",
-      "Description" : "Arn of Email SES address"
-    },
-    "EmailReplyToAddress": {
-      "Type": "AWS::SSM::Parameter::Value<String>",
-      "Description": "reply to email address from parameter store."
-    }
-  },
   "Resources": {
     "BlogPostUserPool": {
       "Type": "AWS::Cognito::UserPool",
@@ -73,7 +63,7 @@
               {"HttpMethod":"GET", "ResourcePath": "/blog/{id}"},
               {"HttpMethod":"POST", "ResourcePath": "/blog/"},
               {"HttpMethod":"PUT", "ResourcePath": "/blog/{id}"}
-              ],
+              ],         
           "StageName": "Prod",
           "Cors": {
               "AllowMethods": "'*'",
@@ -89,6 +79,54 @@
           }
         }
       },
+    "InvokeRoleAll": {
+     "Type" : "AWS::IAM::Role",
+     "Properties" : {
+       "RoleName" : "InvokeRoleAll",
+       "AssumeRolePolicyDocument" : {
+         "Statement": {
+           "Effect": "Allow",
+           "Principal": { "Service": ["apigateway.amazonaws.com"] },
+           "Action": "sts:AssumeRole"
+         }
+       },
+       "Policies" : [
+        {
+          "PolicyName": "LambdaInvokePolicy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "execute-api:invoke"
+                    ],
+                    "Resource": ["*"]
+                }
+            ]
+          }
+        }
+        ]
+      }
+    },
+    "BlogPostIdentityPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+       "IdentityPoolName" : "BlogPostIdentityPool",
+       "AllowClassicFlow" : false,
+       "AllowUnauthenticatedIdentities" : false
+      }
+    },
+    "MyIdentityPoolRoles": {
+     "Type" : "AWS::Cognito::IdentityPoolRoleAttachment",
+      "Properties" : {
+       "IdentityPoolId" : {"Ref": "BlogPostIdentityPool"},
+       "Roles": 
+          { 
+              "authenticated": {"Fn::GetAtt": ["InvokeRoleAll","Arn"]}
+          }
+      }
+    },
     "Get": {
       "Type": "AWS::Serverless::Function",      
       "Properties": {
@@ -260,6 +298,10 @@
     "UserPoolClientId": {
       "Description": "App Client Id",
       "Value": {"Fn::Sub": "${BlogPostUserPoolClient}"}
+    },
+    "IdentityPoolId": {
+      "Description": "Identity Pool Id",
+      "Value": {"Fn::Sub": "${BlogPostIdentityPool}"}
     }
   }
 }

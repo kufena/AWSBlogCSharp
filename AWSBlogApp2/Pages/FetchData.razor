@@ -43,7 +43,31 @@ else
     protected override async Task OnInitializedAsync()
     {
 
-        string url = @"https://eivhxb9uc1.execute-api.eu-west-2.amazonaws.com/Prod/";
+        // Initialize the Amazon Cognito credentials provider
+        /*CognitoAWSCredentials credentials = new CognitoAWSCredentials(
+            "eu-west-2:8d0ca14e-4794-4325-9a2f-2c26d7c7075e", // Identity pool ID
+            RegionEndpoint.EUWest2 // Region
+        );*/
+        /*
+        var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
+        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
+
+        var payload = JwtPayload.Deserialize(Statics.authResponse.AuthenticationResult.IdToken);
+        
+        var user = userPool.GetUser("fairtomiddlingster@gmail.com");
+
+        var credentials = new CognitoAWSCredentials(
+        user.ClientID,
+        Statics.identityPoolID,
+        "",
+        "",
+        Amazon.RegionEndpoint.EUWest2);
+
+        var creds = await credentials.GetCredentialsAsync();
+        */
+
+
+        string url = Statics.apiURL;
         blogposts = new Dictionary<int, BlogPostURL>();
         HttpRequestMessage hrm = new HttpRequestMessage
         {

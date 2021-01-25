@@ -40,6 +40,25 @@ namespace AWSBlogCSharp
         {
             // ToDo: Not sure this is the best way to do this - probalby ought to use a DI framework.
             context.Logger.LogLine("Get ALL Request\n");
+            context.Logger.LogLine($"Here's the identity id = {context.Identity.IdentityId}");
+            context.Logger.LogLine($"Here's the pool id = {context.Identity.IdentityPoolId}");
+
+            if (request.RequestContext != null && request.RequestContext.Identity != null)
+            {
+                context.Logger.LogLine($"{request.RequestContext.Identity.User}");
+                context.Logger.LogLine($"{request.RequestContext.Identity.UserArn}");
+                context.Logger.LogLine($"{request.RequestContext.Identity.CognitoIdentityId}");
+                context.Logger.LogLine($"{request.RequestContext.Identity.CognitoIdentityPoolId}");
+            }
+
+            context.Logger.LogLine("Headers::");
+            if (request.Headers != null)
+            {
+                foreach(var h in request.Headers)
+                {
+                    context.Logger.LogLine($"{h.Key} :: {h.Value}");
+                }
+            }
             //bool statusClause = false;
             //bool statusStr = false;
             //if (request.QueryStringParameters.ContainsKey("status")) {
