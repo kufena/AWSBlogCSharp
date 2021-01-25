@@ -87,9 +87,16 @@
          "Statement": {
            "Effect": "Allow",
            "Principal": { "Service": ["apigateway.amazonaws.com"] },
-           "Action": "sts:AssumeRole"
-         }
-       },
+           "Action": "sts:AssumeRole",
+           "Condition": {
+               "StringEquals": {
+                "cognito-identity.amazonaws.com:aud": "BlogPostIdentityPool"  
+               },
+               "ForAnyValue:StringLike":{ "cognito-identity.amazonaws.com:amr": "authenticated" 
+               }
+             }
+           }
+         },
        "Policies" : [
         {
           "PolicyName": "LambdaInvokePolicy",
