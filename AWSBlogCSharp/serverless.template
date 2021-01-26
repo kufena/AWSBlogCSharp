@@ -37,7 +37,7 @@
                     {
                     "Name" : "email",
                     "AttributeDataType" : "String",
-                    "Required": true
+                    "Required": true,
                     },
                     {
                       "Name" : "nickname",
@@ -69,16 +69,25 @@
               "AllowMethods": "'*'",
               "AllowOrigin": "'*'"
           },
-          "Auth" : {
-             "Authorizers": {
-               "MyAuthorizer": {
-                 "UserPoolArn": {"Fn::GetAtt" : [ "BlogPostUserPool","Arn"]}
-               }
-             },
-             "DefaultAuthorizer": "MyAuthorizer"
+          "Auth": {
+            "DefaultAuthorizer": "AWS_IAM"
           }
         }
       },
+    "BlogPostIdentityPool": {
+      "Type": "AWS::Cognito::IdentityPool",
+      "Properties": {
+       "IdentityPoolName" : "BlogPostIdentityPool",
+       "AllowClassicFlow" : false,
+       "AllowUnauthenticatedIdentities" : false,
+     "CognitoIdentityProviders" : [
+     {
+      "ClientId" : {"Ref": "BlogPostUserPoolClient"}
+      "ProviderName" : {"Fn::GetAtt": ["BlogPostUserPool","ProviderName"]}
+     }
+     ]
+      }
+    },
     "InvokeRoleAll": {
      "Type" : "AWS::IAM::Role",
      "Properties" : {
@@ -86,11 +95,11 @@
        "AssumeRolePolicyDocument" : {
          "Statement": {
            "Effect": "Allow",
-           "Principal": { "Service": ["apigateway.amazonaws.com"] },
-           "Action": "sts:AssumeRole",
+           "Principal": { "Federated": ["cognito-identity.amazonaws.com"] },
+           "Action": ["sts:AssumeRoleWithWebIdentity","sts:TagSession"],
            "Condition": {
                "StringEquals": {
-                "cognito-identity.amazonaws.com:aud": "BlogPostIdentityPool"  
+                "cognito-identity.amazonaws.com:aud": { "Ref": "BlogPostIdentityPool" }  
                },
                "ForAnyValue:StringLike":{ "cognito-identity.amazonaws.com:amr": "authenticated" 
                }
@@ -108,20 +117,15 @@
                     "Action": [
                         "execute-api:invoke"
                     ],
-                    "Resource": ["*"]
+                    "Resource": [{ "Fn::Sub": ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*", 
+                                               { "RootResourceId" : {"Fn::GetAtt": ["MyApi", "RootResourceId"]}}
+                                              ]
+                                 }]
                 }
             ]
           }
         }
         ]
-      }
-    },
-    "BlogPostIdentityPool": {
-      "Type": "AWS::Cognito::IdentityPool",
-      "Properties": {
-       "IdentityPoolName" : "BlogPostIdentityPool",
-       "AllowClassicFlow" : false,
-       "AllowUnauthenticatedIdentities" : false
       }
     },
     "MyIdentityPoolRoles": {
@@ -155,10 +159,7 @@
             "Properties": {
               "Path": "/blog/{id}",
               "Method": "GET",
-              "RestApiId": "MyApi",
-              "Auth" : {
-                "Authorizer" : "MyAuthorizer"
-                }
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -185,10 +186,7 @@
             "Properties": {
               "Path": "/",
               "Method": "GET",
-              "RestApiId": "MyApi",
-              "Auth" : {
-                "Authorizer" : "MyAuthorizer"
-                }
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -215,10 +213,7 @@
             "Properties": {
               "Path": "/blog/",
               "Method": "POST",
-              "RestApiId": "MyApi",
-              "Auth" : {
-                "Authorizer" : "MyAuthorizer"
-                }
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -245,10 +240,7 @@
             "Properties": {
               "Path": "/blog/{id}",
               "Method": "PUT",
-              "RestApiId": "MyApi",
-              "Auth" : {
-                "Authorizer" : "MyAuthorizer"
-                }
+              "RestApiId": "MyApi"
             }
           }
         }
@@ -309,6 +301,13 @@
     "IdentityPoolId": {
       "Description": "Identity Pool Id",
       "Value": {"Fn::Sub": "${BlogPostIdentityPool}"}
+    },
+    "PolicyArnUsed": {
+      "Description": "Policy Arn Used",
+      "Value": { "Fn::Sub": ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*", 
+                                               { "RootResourceId" : {"Fn::GetAtt": ["MyApi", "RootResourceId"]}}
+                                              ]
+                                 }
     }
   }
 }
