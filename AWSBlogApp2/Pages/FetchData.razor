@@ -46,17 +46,24 @@ else
         // Initialize the Amazon Cognito credentials provider
 
         //AmazonApiGatewayV2Client apiclient = new AmazonApiGatewayV2Client(Statics.creds);
-        
 
-        string url = Statics.apiURL;
+
         blogposts = new Dictionary<int, BlogPostURL>();
+
+        var client = new HttpClient();
+        var response = await client.GetAsync(
+          Statics.apiURL,
+          regionName: "eu-west-2",
+          serviceName: "execute-api",
+          credentials: Statics.creds);
+        /*
         HttpRequestMessage hrm = new HttpRequestMessage
         {
             RequestUri = new Uri(url)
         };
         hrm.Headers.Add("Authorization", Statics.id_token);
         var hufflepuff = new HttpClient(new HttpClientHandler());
-        var response = await hufflepuff.SendAsync(hrm);
+        var response = await hufflepuff.SendAsync(hrm); */
         if (response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             var blogstr = await response.Content.ReadAsStringAsync();

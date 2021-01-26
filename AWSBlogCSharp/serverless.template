@@ -78,14 +78,14 @@
       "Type": "AWS::Cognito::IdentityPool",
       "Properties": {
        "IdentityPoolName" : "BlogPostIdentityPool",
-       "AllowClassicFlow" : false,
+       "AllowClassicFlow" : false,        
        "AllowUnauthenticatedIdentities" : false,
-     "CognitoIdentityProviders" : [
-     {
-      "ClientId" : {"Ref": "BlogPostUserPoolClient"}
-      "ProviderName" : {"Fn::GetAtt": ["BlogPostUserPool","ProviderName"]}
-     }
-     ]
+       "CognitoIdentityProviders" : [
+         {
+         "ClientId" : {"Ref": "BlogPostUserPoolClient"}
+         "ProviderName" : {"Fn::GetAtt": ["BlogPostUserPool","ProviderName"]}
+         }
+       ]
       }
     },
     "InvokeRoleAll": {
@@ -132,6 +132,8 @@
      "Type" : "AWS::Cognito::IdentityPoolRoleAttachment",
       "Properties" : {
        "IdentityPoolId" : {"Ref": "BlogPostIdentityPool"},
+       "RoleMappings" : {
+       },
        "Roles": 
           { 
               "authenticated": {"Fn::GetAtt": ["InvokeRoleAll","Arn"]}

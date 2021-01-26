@@ -45,10 +45,10 @@ namespace AWSBlogCSharp
 
             if (request.RequestContext != null && request.RequestContext.Identity != null)
             {
-                context.Logger.LogLine($"{request.RequestContext.Identity.User}");
-                context.Logger.LogLine($"{request.RequestContext.Identity.UserArn}");
-                context.Logger.LogLine($"{request.RequestContext.Identity.CognitoIdentityId}");
-                context.Logger.LogLine($"{request.RequestContext.Identity.CognitoIdentityPoolId}");
+                context.Logger.LogLine($"{request.RequestContext.Identity.User}"); // AROA3LOFKCR5TBKWJMMYN:CognitoIdentityCredentials
+                context.Logger.LogLine($"{request.RequestContext.Identity.UserArn}"); // arn:aws:sts::780487234683:assumed-role/InvokeRoleAll/CognitoIdentityCredentials
+                context.Logger.LogLine($"{request.RequestContext.Identity.CognitoIdentityId}"); // eu-west-2:eda6f0b8-ec5f-43df-915e-f164e4d83ee9
+                context.Logger.LogLine($"{request.RequestContext.Identity.CognitoIdentityPoolId}"); // eu-west-2:5b2ed568-fa52-4376-b719-b74bcc698b92
             }
 
             context.Logger.LogLine("Headers::");
