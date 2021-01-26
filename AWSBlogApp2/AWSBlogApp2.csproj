@@ -10,6 +10,7 @@
     <PackageReference Include="AWSSDK.Core" Version="3.5.2" />
     <PackageReference Include="AwsSignatureVersion4" Version="1.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

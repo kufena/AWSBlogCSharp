@@ -1,0 +1,41 @@
+﻿@page "/newblog"
+@inject NavigationManager Navigation
+ 
+<h3>NewBlog</h3>
+
+<p>
+    Title: <input type="text" @bind="model.Title" />
+    <button @onclick="NewBlogPost">Create</button>
+</p>
+@code {
+    BlogPostModel model = new BlogPostModel
+    {
+        Date = DateTime.Now,
+        Hash = "",
+        Version = 0,
+        Status = true,
+        Text = ""
+    };
+
+    private async void NewBlogPost()
+    {
+        var client = new HttpClient();
+        var content = System.Net.Http.Json.JsonContent.Create<BlogPostModel>(model, null, null);
+        var response = await client.PostAsync(Statics.apiURL + "blog/", content,
+          regionName: "eu-west-2",
+          serviceName: "execute-api",
+          credentials: Statics.creds);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Console.WriteLine("Got a new blog created!");
+            Navigation.NavigateTo("/fetchdata");
+        }
+        else
+        {
+            string c = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Bugger {response.StatusCode} {c}");
+        }
+
+    }
+}

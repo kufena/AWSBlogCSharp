@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogCSharp.Tests", "AWSB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogModel", "AWSBlogModel\AWSBlogModel.csproj", "{D48CF9E0-187D-4B49-AD4A-BF7A48483977}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSBlogApp2", "AWSBlogApp2\AWSBlogApp2.csproj", "{C8238282-E3E2-4C81-8B2D-4F64A407F1C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogApp2", "AWSBlogApp2\AWSBlogApp2.csproj", "{C8238282-E3E2-4C81-8B2D-4F64A407F1C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

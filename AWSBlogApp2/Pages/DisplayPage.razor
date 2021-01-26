@@ -1,0 +1,30 @@
+﻿@page "/displaypage/{id}"
+
+<h3>DisplayPage</h3>
+
+<input type="text" @bind-value="title" />
+<input type="text" @bind-value="text" />
+
+@code {
+    int id;
+    string title = "";
+    string text = "";
+    BlogPostModel model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var url = $"{Statics.apiURL}blog/{id}";
+
+        var client = new HttpClient();
+        var response = await client.GetAsync(url, regionName: "eu-west-2", serviceName: "execute-api", credentials: Statics.creds);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var modelstr = await response.Content.ReadAsStringAsync();
+            model = JsonSerializer.Deserialize<BlogPostModel>(modelstr);
+            title = model.Title;
+            text = model.Text;
+            StateHasChanged();
+        }
+    }
+}
