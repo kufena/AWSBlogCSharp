@@ -23,6 +23,10 @@ PUT <root>/blog/id
           hash must be the hash of the version you are updating.  Date is ignored.
         - return a URL to the new resource for that id.
 
+The template builds; a cognito user pool and client, a cognito identity pool, a role associated with authenticated users
+in the identity pool, an api gateway that uses AWS_IAM as an authorizer, and four lambda functions that implement the four
+implement methods.
+
 Deploy using this command:
 
     dotnet lambda deploy-serverless GateHouseWerehamBlog --s3-bucket thegatehousewereham.home -tp "EmailSourceArn=EmailSourceArn;EmailReplyToAddress=EmailReplyToAddress"

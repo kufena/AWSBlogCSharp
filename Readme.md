@@ -1,6 +1,6 @@
 # A Blog API using AWS Serverless technology.
 
-*This is a work in progress.*
+**This is a work in progress.**
 
 This is a serverless app for a blog hosting set up.
 
@@ -30,10 +30,13 @@ There must be a better way to do this - it costs money, for a start!
 
 I am not a front-end developer - never have been.  I am trying to learn Blazor, which is an up hill battle
 at the moment.  So far, there is a sign-up page which is not robust, but which does allow you to register a
-user, confirm using the emailed code and log in.
+user, confirm using the emailed code and log in.  It then fetches AWS credentials that allow you to sign an
+http request to the client.  The fetch data page uses this to get the list of blog posts.
 
-It also uses a Statics class to pass the tokens to the fetch data class, which uses the ID token
+I use a Statics class to pass the tokens to the fetch data class, which uses the ID token
 to access the / path of the API (there are no users yet - the blog bit needs fixing - otherwise, that's
 the path that shows all blog posts, so far.)
+
+It's still a work in progress!
 
 That's all for now.
