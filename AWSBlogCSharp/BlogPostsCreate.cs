@@ -48,6 +48,8 @@ namespace AWSBlogCSharp
 
             BlogPostModel bpm = JsonSerializer.Deserialize<BlogPostModel>( request.Body );
             Console.WriteLine("Deserialized body");
+            Console.WriteLine($"{bpm.Title} {bpm.Date} {bpm.Text} {bpm.Status}");
+
             if (bpm.Version != 0) {
                 response = new APIGatewayProxyResponse {
                     StatusCode = (int)HttpStatusCode.BadRequest,
@@ -85,7 +87,10 @@ namespace AWSBlogCSharp
                 // create a db model
                 // save the db model
                 
-                string inputstring = $"{id}:{DateTime.Now}:{bpm.Version}:{bpm.Title}:{bpm.Text}:";                
+                string inputstring = $"{id}:{DateTime.Now}:{bpm.Version}:{bpm.Title}:{bpm.Text}:";
+
+                Console.WriteLine("Our hash string::" + inputstring);
+
                 var base64hash = HashBlog.MakeHash(inputstring);
                 
                 Console.WriteLine("New Hash:::" + base64hash);

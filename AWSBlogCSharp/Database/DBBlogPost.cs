@@ -27,6 +27,9 @@ namespace AWSBlogCSharp.Database
             this.version = Version;
             this.status = Status;
             this.hash = hash;
+
+            Console.WriteLine("Creating DB Blog Post with this set of values.");
+            Console.WriteLine($"{this.title} {this.id} {this.version} {this.status} {this.file}");
         }
 
         public string Title { get => title; set => title = value; }

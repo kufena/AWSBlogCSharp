@@ -20,7 +20,14 @@
     private async void NewBlogPost()
     {
         var client = new HttpClient();
-        var content = System.Net.Http.Json.JsonContent.Create<BlogPostModel>(model, null, null);
+        var modeltext = System.Text.Json.JsonSerializer.Serialize<BlogPostModel>(model);
+        new JsonSerializerOptions();
+
+        Console.WriteLine("Here's our s.t.j text::");
+        Console.WriteLine(modeltext);
+        Console.WriteLine("How's that?");
+
+        var content = new StringContent(modeltext, System.Text.Encoding.UTF8, "application/json"); //System.Net.Http.Json.JsonContent.Create<BlogPostModel>(model, null, null);
         var response = await client.PostAsync(Statics.apiURL + "blog/", content,
           regionName: "eu-west-2",
           serviceName: "execute-api",
