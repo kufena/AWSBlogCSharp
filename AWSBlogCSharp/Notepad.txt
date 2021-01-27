@@ -1,47 +1,7 @@
-﻿{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "execute-api:Invoke"           
-      ],
-      "Resource": [
-        "arn:aws:execute-api:us-east-1:<account>:<rest-api>/*/POST/graphql"
-      ]
-    }
-  ]
-} 
+﻿
 
-"eu-west-2:8d0ca14e-4794-4325-9a2f-2c26d7c7075e", // Identity pool ID
 
-I've used:
-
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "mobileanalytics:PutEvents",
-        "cognito-sync:*",
-        "cognito-identity:*"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "execute-api:Invoke"           
-      ],
-      "Resource": [
-        "arn:aws:execute-api:eu-west-2:780487234683:4c6p1ydzy7/*/GET/",
-        "arn:aws:execute-api:eu-west-2:780487234683:4c6p1ydzy7/*/PUT/",
-        "arn:aws:execute-api:eu-west-2:780487234683:4c6p1ydzy7/*/POST/",
-        "arn:aws:execute-api:eu-west-2:780487234683:4c6p1ydzy7/*/OPTIONS/"
-      ]
-    }
-  ]
-}
+                    "Resource": [{ "Fn::Sub": ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*", 
+                                               { "RootResourceId" : {"Fn::GetAtt": ["MyApi", "RootResourceId"]}}
+                                              ]
+                                 }]

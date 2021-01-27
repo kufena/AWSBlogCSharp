@@ -118,9 +118,8 @@
                         "execute-api:invoke"
                     ],
                     "Resource": [{ "Fn::Sub": ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*", 
-                                               { "RootResourceId" : {"Fn::GetAtt": ["MyApi", "RootResourceId"]}}
-                                              ]
-                                 }]
+                                               { "RootResourceId" : {"Ref": "MyApi"}}]
+                                              }]
                 }
             ]
           }
@@ -307,9 +306,8 @@
     "PolicyArnUsed": {
       "Description": "Policy Arn Used",
       "Value": { "Fn::Sub": ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*", 
-                                               { "RootResourceId" : {"Fn::GetAtt": ["MyApi", "RootResourceId"]}}
-                                              ]
-                                 }
+                                               { "RootResourceId" : {"Ref": "MyApi"}}]
+                                              }
     }
   }
 }
