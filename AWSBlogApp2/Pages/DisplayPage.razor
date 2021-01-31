@@ -1,21 +1,33 @@
 ﻿@page "/displaypage/{id:int}"
 @inject SessionState Statics
+@inject NavigationManager Navigation
 
 <h3>DisplayPage</h3>
 
-<input type="text" @bind-value="title" />
-<input type="text" @bind-value="text" />
+Title:  <input type="text" @bind-value="model.Title" />
+<br />
+Text: <textarea cols="40" rows="15" @bind="model.Text" />
+<br/>
+<label><input type="checkbox" @bind-value="model.Status"/>Published</label>
 
+<br />
+<button @onclick="Submit" disabled="@button">Update</button>
 @code { 
     [Parameter]
     public int id { get; set; }
 
-    string title = "";
-    string text = "";
     BlogPostModel model;
+    bool button = false;
 
     protected override async Task OnInitializedAsync()
     {
+        model = new BlogPostModel
+        {
+            Title = "",
+            Text = "",
+            Status = false
+        };
+
         var url = $"{Statics.apiURL}blog/{id}";
 
         var client = new HttpClient();
@@ -25,9 +37,39 @@
         {
             var modelstr = await response.Content.ReadAsStringAsync();
             model = JsonSerializer.Deserialize<BlogPostModel>(modelstr);
-            title = model.Title;
-            text = model.Text;
             StateHasChanged();
+        }
+    }
+
+    private async void Submit()
+    {
+        button = false;
+        HttpClient client = new HttpClient();
+        var content = new StringContent(JsonSerializer.Serialize<BlogPostModel>(model));
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        //"application/json";
+
+        var message = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{Statics.apiURL}blog/{id}"),
+            Method = HttpMethod.Put,
+            Content = content
+        };
+        var response = await client.SendAsync(
+                                        message,
+                                        regionName: RegionEndpoint.EUWest2.SystemName,
+                                        serviceName: "execute-api",
+                                        credentials: Statics.creds);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Console.WriteLine("Seems ok");
+            Navigation.NavigateTo("/fetchdata");
+        }
+        else
+        {
+            Console.WriteLine("Failed to PUT new message.");
+            Navigation.NavigateTo("/fetchdata");
         }
     }
 }

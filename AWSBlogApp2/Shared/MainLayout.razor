@@ -1,11 +1,15 @@
 ﻿@inherits LayoutComponentBase
-
+@inject SessionState Statics 
 <div class="sidebar">
     <NavMenu />
 </div>
 
 <div class="main">
     <div class="top-row px-4">
+        @if (Statics.id_token != null)
+        {
+            @($"Hello {Statics.myidtoken.Payload["nickname"]}")
+        }
         <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
     </div>
 

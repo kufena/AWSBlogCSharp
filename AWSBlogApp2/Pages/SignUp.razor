@@ -88,9 +88,9 @@
         Statics.id_token = Statics.authResponse.AuthenticationResult.IdToken;
         Statics.refresh_token = Statics.authResponse.AuthenticationResult.RefreshToken;
 
-        var myidtoken = new JwtSecurityToken(Statics.id_token);
+        Statics.myidtoken = new JwtSecurityToken(Statics.id_token);
         var myaccesstoken = new JwtSecurityToken(Statics.access_token);
-        Console.WriteLine(myidtoken);
+        Console.WriteLine(Statics.myidtoken);
         Console.WriteLine(myaccesstoken);
 
         var credentials = new CognitoAWSCredentials(Statics.identityPoolID, RegionEndpoint.EUWest2);
