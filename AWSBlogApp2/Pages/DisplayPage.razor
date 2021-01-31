@@ -1,12 +1,15 @@
-﻿@page "/displaypage/{id}"
+﻿@page "/displaypage/{id:int}"
+@inject SessionState Statics
 
 <h3>DisplayPage</h3>
 
 <input type="text" @bind-value="title" />
 <input type="text" @bind-value="text" />
 
-@code {
-    int id;
+@code { 
+    [Parameter]
+    public int id { get; set; }
+
     string title = "";
     string text = "";
     BlogPostModel model;

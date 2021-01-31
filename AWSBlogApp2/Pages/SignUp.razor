@@ -1,12 +1,6 @@
 ﻿@page "/signup"
-@using Amazon.Auth;
-@using Amazon.CognitoIdentity;
-@using Amazon.CognitoIdentityProvider;
-@using Amazon.CognitoIdentity.Model;
-@using Amazon.CognitoIdentityProvider.Model;
-@using Amazon.Runtime;
-@using Amazon.Extensions.CognitoAuthentication;
-
+@inject SessionState Statics
+ 
 <h3>SignUp</h3>
 <p>
     Register Here::

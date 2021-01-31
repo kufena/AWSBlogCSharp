@@ -18,6 +18,7 @@ namespace AWSBlogApp2
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
         }
 
         public IConfiguration Configuration { get; }
@@ -29,6 +30,9 @@ namespace AWSBlogApp2
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+
+            services.AddScoped<SessionState>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

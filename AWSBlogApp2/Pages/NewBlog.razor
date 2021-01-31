@@ -1,48 +1,47 @@
 ﻿@page "/newblog"
 @inject NavigationManager Navigation
- 
+@inject SessionState Statics
+
 <h3>NewBlog</h3>
 
 <p>
     Title: <input type="text" @bind="model.Title" />
     <button @onclick="NewBlogPost">Create</button>
 </p>
-@code {
-    BlogPostModel model = new BlogPostModel
-    {
-        Date = DateTime.Now,
-        Hash = "",
-        Version = 0,
-        Status = true,
-        Text = ""
-    };
+@code { BlogPostModel model = new BlogPostModel
+            {
+                Date = DateTime.Now,
+                Hash = "",
+                Version = 0,
+                Status = true,
+                Text = ""
+            };
 
-    private async void NewBlogPost()
-    {
-        var client = new HttpClient();
-        var modeltext = System.Text.Json.JsonSerializer.Serialize<BlogPostModel>(model);
-        new JsonSerializerOptions();
+            private async void NewBlogPost()
+            {
+                var client = new HttpClient();
+                var modeltext = System.Text.Json.JsonSerializer.Serialize<BlogPostModel>(model);
+                new JsonSerializerOptions();
 
-        Console.WriteLine("Here's our s.t.j text::");
-        Console.WriteLine(modeltext);
-        Console.WriteLine("How's that?");
+                Console.WriteLine("Here's our s.t.j text::");
+                Console.WriteLine(modeltext);
+                Console.WriteLine("How's that?");
 
-        var content = new StringContent(modeltext, System.Text.Encoding.UTF8, "application/json"); //System.Net.Http.Json.JsonContent.Create<BlogPostModel>(model, null, null);
-        var response = await client.PostAsync(Statics.apiURL + "blog/", content,
-          regionName: "eu-west-2",
-          serviceName: "execute-api",
-          credentials: Statics.creds);
+                var content = new StringContent(modeltext, System.Text.Encoding.UTF8, "application/json"); //System.Net.Http.Json.JsonContent.Create<BlogPostModel>(model, null, null);
+                var response = await client.PostAsync(Statics.apiURL + "blog/", content,
+                  regionName: "eu-west-2",
+                  serviceName: "execute-api",
+                  credentials: Statics.creds);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            Console.WriteLine("Got a new blog created!");
-            Navigation.NavigateTo("/fetchdata");
-        }
-        else
-        {
-            string c = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Bugger {response.StatusCode} {c}");
-        }
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    Console.WriteLine("Got a new blog created!");
+                    Navigation.NavigateTo("/fetchdata");
+                }
+                else
+                {
+                    string c = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Bugger {response.StatusCode} {c}");
+                }
 
-    }
-}
+            } }
