@@ -44,6 +44,7 @@ namespace AWSBlogCSharp
             APIGatewayProxyResponse response;
 
             string idStr = request.PathParameters["id"];
+            string user = request.PathParameters["user"];
 
             int id = 0;
             if (!Int32.TryParse(idStr, out id))
@@ -103,7 +104,7 @@ namespace AWSBlogCSharp
 
                 if (statusClause)
                 {
-                    var versions = from blog in bpc.BlogPost where (blog.Id == id) && (blog.Status == statusStr) orderby blog.Version descending select blog;
+                    var versions = from blog in bpc.BlogPost where (blog.User == user) && (blog.Id == id) && (blog.Status == statusStr) orderby blog.Version descending select blog;
                     if (versions.Count() != 0) latest = versions.First();
                 }
                 else
@@ -115,7 +116,7 @@ namespace AWSBlogCSharp
                     }
                     else
                     {
-                        var versions = from blog in bpc.BlogPost where (blog.Id == id) orderby blog.Version descending select blog;
+                        var versions = from blog in bpc.BlogPost where (blog.User == user) && (blog.Id == id) orderby blog.Version descending select blog;
                         if (versions.Count() != 0) latest = versions.First();
                     }
                 }

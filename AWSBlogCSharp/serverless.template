@@ -59,10 +59,10 @@
       "Type": "AWS::Serverless::Api",
       "Properties": {
           "MethodSettings": [
-              {"HttpMethod":"GET", "ResourcePath": "/"},
-              {"HttpMethod":"GET", "ResourcePath": "/blog/{id}"},
-              {"HttpMethod":"POST", "ResourcePath": "/blog/"},
-              {"HttpMethod":"PUT", "ResourcePath": "/blog/{id}"}
+              {"HttpMethod":"GET", "ResourcePath": "/{user}/"},
+              {"HttpMethod":"GET", "ResourcePath": "/{user}/blog/{id}"},
+              {"HttpMethod":"POST", "ResourcePath": "/{user}/blog/"},
+              {"HttpMethod":"PUT", "ResourcePath": "/{user}/blog/{id}"}
               ],         
           "StageName": "Prod",
           "Cors": {
@@ -117,11 +117,13 @@
                     "Action": [
                         "execute-api:invoke"
                     ],
-                    "Resource": [{ "Fn::Sub": ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*", 
-                                               { "RootResourceId" : {"Ref": "MyApi"}}]
-                                              }]
+                    "Resource": [{ "Fn::Sub": 
+                    ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*/${!cognito-identity.amazonaws.com:sub}/*", 
+                                               { "RootResourceId" : {"Ref": "MyApi"}}
+                                              ]
+                                 }]
                 }
-            ]
+            ]            
           }
         }
         ]
@@ -158,7 +160,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/blog/{id}",
+              "Path": "/{user}/blog/{id}",
               "Method": "GET",
               "RestApiId": "MyApi"
             }
@@ -185,7 +187,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/",
+              "Path": "/{user}/",
               "Method": "GET",
               "RestApiId": "MyApi"
             }
@@ -212,7 +214,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/blog/",
+              "Path": "/{user}/blog/",
               "Method": "POST",
               "RestApiId": "MyApi"
             }
@@ -239,7 +241,7 @@
           "RootGet": {
             "Type": "Api",
             "Properties": {
-              "Path": "/blog/{id}",
+              "Path": "/{user}/blog/{id}",
               "Method": "PUT",
               "RestApiId": "MyApi"
             }

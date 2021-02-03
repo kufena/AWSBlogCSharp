@@ -5,3 +5,9 @@
                                                { "RootResourceId" : {"Fn::GetAtt": ["MyApi", "RootResourceId"]}}
                                               ]
                                  }]
+
+                                 "Resource": [{ "Fn::Sub": 
+                    ["arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RootResourceId}/Prod/*/${!cognito-identity.amazonaws.com:sub}/*", 
+                     { "RootResourceId" : {"Ref": "MyApi"}}]
+                                              }],
+

@@ -33,43 +33,51 @@
 
 @code { private Dictionary<int, BlogPostURL> blogposts;
 
-            public void NavigateToCounterComponent(int id)
-            {
-                Navigation.NavigateTo($"displaypage/{id}");
-            }
+    public void NavigateToCounterComponent(int id)
+    {
+        Navigation.NavigateTo($"displaypage/{id}");
+    }
 
-            protected override async Task OnInitializedAsync()
-            {
+    protected override async Task OnInitializedAsync()
+    {
 
-                // Initialize the Amazon Cognito credentials provider
+        // Initialize the Amazon Cognito credentials provider
 
-                //AmazonApiGatewayV2Client apiclient = new AmazonApiGatewayV2Client(Statics.creds);
+        //AmazonApiGatewayV2Client apiclient = new AmazonApiGatewayV2Client(Statics.creds);
 
 
-                blogposts = new Dictionary<int, BlogPostURL>();
+        string sub = await Statics.credentials.GetIdentityIdAsync();
+        //int p = sub.IndexOf(':');
+        //sub = sub.Substring(p + 1);
+        blogposts = new Dictionary<int, BlogPostURL>();
 
-                var client = new HttpClient();
-                var response = await client.GetAsync(
-                  Statics.apiURL,
-                  regionName: "eu-west-2",
-                  serviceName: "execute-api",
-                  credentials: Statics.creds);
-                /*
-                HttpRequestMessage hrm = new HttpRequestMessage
-                {
-                    RequestUri = new Uri(url)
-                };
-                hrm.Headers.Add("Authorization", Statics.id_token);
-                var hufflepuff = new HttpClient(new HttpClientHandler());
-                var response = await hufflepuff.SendAsync(hrm); */
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    var blogstr = await response.Content.ReadAsStringAsync();
-                    var blogs = JsonSerializer.Deserialize<BlogPostURL[]>(blogstr);
-                    foreach (var b in blogs) blogposts.Add(b.Id, b);
-                }
-                else
-                {
-                    Console.WriteLine($"Expected better.  {response.StatusCode} {response.ReasonPhrase} {response.RequestMessage}");
-                }
-            } }
+        var client = new HttpClient();
+        HttpRequestMessage hrm = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{Statics.apiURL}{sub}/")
+        };
+        //hrm.Headers.Add("Authorization", Statics.id_token);
+
+        var response = await client.SendAsync(
+            hrm,
+            regionName: "eu-west-2",
+            serviceName: "execute-api",
+            credentials: Statics.creds);
+
+        //var response = await client.GetAsync(
+        //  $"{Statics.apiURL}{sub}/",
+        //  regionName: "eu-west-2",
+        //  serviceName: "execute-api",
+        //  credentials: Statics.creds);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var blogstr = await response.Content.ReadAsStringAsync();
+            var blogs = JsonSerializer.Deserialize<BlogPostURL[]>(blogstr);
+            foreach (var b in blogs) blogposts.Add(b.Id, b);
+        }
+        else
+        {
+            Console.WriteLine($"Expected better.  {response.StatusCode} {response.ReasonPhrase} {response.RequestMessage}");
+        }
+    } }

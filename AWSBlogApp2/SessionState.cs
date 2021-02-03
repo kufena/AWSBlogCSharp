@@ -1,4 +1,5 @@
-﻿using Amazon.Extensions.CognitoAuthentication;
+﻿using Amazon.CognitoIdentity;
+using Amazon.Extensions.CognitoAuthentication;
 using Amazon.Runtime;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace AWSBlogApp2
         public AuthFlowResponse authResponse { get; set; }
         public ImmutableCredentials creds { get; set; }
         public JwtSecurityToken myidtoken { get; set; }
+        public CognitoAWSCredentials credentials { get; set; }
+
         public string poolID = "eu-west-2_Xf5hiOI0w";
         public string clientID = "7dbtqls1deh3cq5ep7g5c1qqe0";
         public string identityPoolID = "eu-west-2:1bd6fd52-1888-40ea-8945-cfbf744bad06";

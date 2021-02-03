@@ -39,6 +39,9 @@ namespace AWSBlogCSharp
         /// <returns>The API Gateway response.</returns>
         public async Task<APIGatewayProxyResponse> Create(APIGatewayProxyRequest request, ILambdaContext context)
         {
+            string user = request.PathParameters["user"];
+            context.Logger.LogLine($"USER PARAMETER IS =--= {user}");
+
             // We expect a model that fits BlogPostModel - so a version, but no id.
             Console.WriteLine("Create Request\n");
             APIGatewayProxyResponse response;
@@ -56,16 +59,36 @@ namespace AWSBlogCSharp
                     Body = $"Version {bpm.Version} Not Zero"
                 };
             }
-            else {
+            else
+            {
                 Console.WriteLine("About to create a new id");
                 // we create an id.
                 int id = 0; //(new Random()).Next(1000000);            
                 var addid = bpc.BlogIds.Add(new DBBlogId("A"));
-                int x = bpc.SaveChanges();
-                if (x == 0) {
+                int x = 0;
+
+                try
+                {
+                    x = bpc.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.ToString());
+                    if (e.InnerException != null)
+                    {
+                        Console.WriteLine("===================");
+                        Console.WriteLine(e.InnerException.Message);
+                        Console.WriteLine(e.InnerException.ToString());
+                    }
+                }
+
+                if (x == 0)
+                {
                     Console.WriteLine("No changes made to db - so that's no good!");
-                    return new APIGatewayProxyResponse {
-                        StatusCode = (int) HttpStatusCode.BadRequest,
+                    return new APIGatewayProxyResponse
+                    {
+                        StatusCode = (int)HttpStatusCode.BadRequest,
                         Body = "Nope, not having the id db thing again"
                     };
                 }
@@ -75,37 +98,47 @@ namespace AWSBlogCSharp
 
                 // let's save the body text to our S3 bucket in a file of our choosing
 
-                AmazonS3Client s3client = new AmazonS3Client( Amazon.RegionEndpoint.EUWest2 );//S3Region.EUW2);
-                var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest {
-                            BucketName = secrets["blogstore"],
-                            Key = $"/Blog{id}/Version{bpm.Version}",
-                            ContentBody = bpm.Text
-                            });
+                AmazonS3Client s3client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);//S3Region.EUW2);
+                var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest
+                {
+                    BucketName = secrets["blogstore"],
+                    Key = $"/{user}/Blog{id}/Version{bpm.Version}",
+                    ContentBody = bpm.Text
+                });
 
                 Console.WriteLine("Written to S3");
 
                 // create a db model
                 // save the db model
-                
-                string inputstring = $"{id}:{DateTime.Now}:{bpm.Version}:{bpm.Title}:{bpm.Text}:";
 
-                Console.WriteLine("Our hash string::" + inputstring);
+                string base64hash = Utilities.CreateBlogPostHash(user, bpm, id);
 
-                var base64hash = HashBlog.MakeHash(inputstring);
-                
-                Console.WriteLine("New Hash:::" + base64hash);
-
-                DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, $"/Blog{id}/Version{bpm.Version}", bpm.Status, base64hash);
-                bpc.BlogPost.Add(dbbp);
-                bpc.SaveChanges();
-                Console.WriteLine("Written to DB");
-
+                try { 
+                    DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, $"{user}/Blog{id}/Version{bpm.Version}", bpm.Status, base64hash, user);
+                    bpc.BlogPost.Add(dbbp);
+                    bpc.SaveChanges();
+                    Console.WriteLine("Written to DB");
+                    
+                }
+                catch (Exception e)
+                {
+                    context.Logger.LogLine(e.Message);
+                    context.Logger.LogLine(e.ToString());
+                    if (e.InnerException != null)
+                    {
+                        context.Logger.LogLine("===================");
+                        context.Logger.LogLine(e.InnerException.Message);
+                        context.Logger.LogLine(e.InnerException.ToString());
+                    }
+                    return new APIGatewayProxyResponse { StatusCode = (int)HttpStatusCode.BadRequest };
+                }
                 // create a response containing the new id - perhaps also a URL - maybe just the URL?
 
-                response = new APIGatewayProxyResponse {
-                            StatusCode = (int)HttpStatusCode.OK,
-                            Body = "{ \"URL\": \"/blog/" + $"{id}" + "\" }",
-                            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
+                response = new APIGatewayProxyResponse
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Body = "{ \"URL\": \"/blog/" + $"{id}" + "\" }",
+                    Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
                                                            , { "Access-Control-Allow-Origin" , "*" }}
                 };
             }

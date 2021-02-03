@@ -99,9 +99,10 @@
         Console.WriteLine(providername);
         credentials.AddLogin(providername, Statics.id_token);
         var creds = credentials.GetCredentials();
-
         Statics.creds = creds;
-        
+        Statics.credentials = credentials;
+
+        Console.WriteLine("log in id::" + credentials);
         Console.WriteLine(creds);
 
     }

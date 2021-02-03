@@ -49,9 +49,10 @@ Text: <textarea cols="40" rows="15" @bind="model.Text" />
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         //"application/json";
 
+        var sub = await Statics.credentials.GetIdentityIdAsync();
         var message = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{Statics.apiURL}blog/{id}"),
+            RequestUri = new Uri($"{Statics.apiURL}{sub}/blog/{id}"),
             Method = HttpMethod.Put,
             Content = content
         };

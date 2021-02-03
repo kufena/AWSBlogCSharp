@@ -43,6 +43,8 @@ namespace AWSBlogCSharp
             Console.WriteLine("Request body:::" + request.Body);
 
             string idStr = request.PathParameters["id"];
+            string user = request.PathParameters["user"];
+
             int id = 0;
             if (!Int32.TryParse(idStr, out id))
             {
@@ -60,8 +62,7 @@ namespace AWSBlogCSharp
             Console.WriteLine($"Updating blog with Id :: {id}");
 
             // create a db model
-            string inputstring = $"{id}:{bpm.Version+1}:{DateTime.Now}:{bpm.Title}:{bpm.Text}:{bpm.Hash}";                
-            var base64hash = HashBlog.MakeHash(inputstring);
+            var base64hash = Utilities.CreateBlogPostHash(user, bpm, id);
             Console.WriteLine("New has will be:::" + base64hash);
 
             
@@ -83,7 +84,7 @@ namespace AWSBlogCSharp
             }
 
             // save the db model
-            DBBlogPost dbbp = new DBBlogPost(id, newVersion, bpm.Title, DateTime.Now, $"/Blog{id}/Version{newVersion}", bpm.Status, base64hash );
+            DBBlogPost dbbp = new DBBlogPost(id, newVersion, bpm.Title, DateTime.Now, $"/{user}/Blog{id}/Version{newVersion}", bpm.Status, base64hash, user );
             try {
                 bpc.BlogPost.Add(dbbp);
                 bpc.SaveChanges();
@@ -101,7 +102,7 @@ namespace AWSBlogCSharp
             AmazonS3Client s3client = new AmazonS3Client( Amazon.RegionEndpoint.EUWest2 );//S3Region.EUW2);
             var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest {
                         BucketName = secrets["blogstore"],
-                        Key = $"/Blog{id}/Version{newVersion}",
+                        Key = $"/{user}/Blog{id}/Version{newVersion}",
                         ContentBody = bpm.Text
                         });
 
@@ -111,7 +112,7 @@ namespace AWSBlogCSharp
 
             response = new APIGatewayProxyResponse {
                         StatusCode = (int)HttpStatusCode.OK,
-                        Body = "{ \"URL\": \"/blog/" + $"{id}?version={newVersion}" + "\" }",
+                        Body = "{ \"URL\": \"/"+$"{user}/blog/{id}?version={newVersion}" + "\" }",
                         Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
                                                            , { "Access-Control-Allow-Origin" , "*" } }
             };
