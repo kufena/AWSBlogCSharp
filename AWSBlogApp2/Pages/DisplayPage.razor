@@ -28,7 +28,7 @@ Text: <textarea cols="40" rows="15" @bind="model.Text" />
             Status = false
         };
 
-        var url = $"{Statics.apiURL}blog/{id}";
+        var url = $"{Statics.apiURL}{Statics.credentials.GetIdentityId()}/blog/{id}";
 
         var client = new HttpClient();
         var response = await client.GetAsync(url, regionName: "eu-west-2", serviceName: "execute-api", credentials: Statics.creds);

@@ -32,6 +32,7 @@ namespace AWSBlogApp2
             services.AddSingleton<WeatherForecastService>();
 
             services.AddScoped<SessionState>();
+            services.AddScoped<Authentication>();
 
         }
 

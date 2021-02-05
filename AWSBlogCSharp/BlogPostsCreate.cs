@@ -96,13 +96,15 @@ namespace AWSBlogCSharp
 
                 Console.WriteLine($"New Id created :: {id}");
 
+                string fileKey = Utilities.MakeBlogFileName(user, id, bpm.Version); 
+                
                 // let's save the body text to our S3 bucket in a file of our choosing
 
                 AmazonS3Client s3client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);//S3Region.EUW2);
                 var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest
                 {
                     BucketName = secrets["blogstore"],
-                    Key = $"/{user}/Blog{id}/Version{bpm.Version}",
+                    Key = fileKey,
                     ContentBody = bpm.Text
                 });
 
@@ -114,7 +116,7 @@ namespace AWSBlogCSharp
                 string base64hash = Utilities.CreateBlogPostHash(user, bpm, id);
 
                 try { 
-                    DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, $"{user}/Blog{id}/Version{bpm.Version}", bpm.Status, base64hash, user);
+                    DBBlogPost dbbp = new DBBlogPost(id, bpm.Version, bpm.Title, DateTime.Now, fileKey, bpm.Status, base64hash, user);
                     bpc.BlogPost.Add(dbbp);
                     bpc.SaveChanges();
                     Console.WriteLine("Written to DB");

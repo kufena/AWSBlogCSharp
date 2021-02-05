@@ -1,5 +1,6 @@
 ﻿@page "/signup"
 @inject SessionState Statics
+@inject Authentication Auth 
  
 <h3>SignUp</h3>
 <p>
@@ -39,71 +40,18 @@
 
     private async void Register()
     {
-        var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
-
-        var useratts = new Dictionary<string, string>();
-        useratts.Add("nickname", nickname);
-
-        Console.WriteLine($"Adding user {email} nickname {nickname}");
-        try
-        {
-            await userPool.SignUpAsync(email, password, useratts, new Dictionary<string, string>());
-            Console.WriteLine("Done sign up async.");
-        } catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong.");
-            Console.WriteLine(e.ToString());
-        }
+        var success = await Auth.registerUser(nickname, password, email);
     }
 
 
     private async void Confirm()
     {
-        var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
-
-        var user = new CognitoUser(email, Statics.clientID, userPool, provider);
-
-        Console.WriteLine($"Adding user {email} confirmation");
-
-        await user.ConfirmSignUpAsync(code, false).ConfigureAwait(false);
-
-        //await userPool.SignUpAsync(email, password, attributes, new Dictionary<string,string>());
-        Console.WriteLine("Done confirm async.");
+        var success = await Auth.confirmUser(email, code);
     }
 
     private async void SignIn()
     {
-        var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
-        var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
-        var user = new CognitoUser(email, Statics.clientID, userPool, provider);
-
-        Statics.authResponse = await user.StartWithSrpAuthAsync(new InitiateSrpAuthRequest()
-        {
-            Password = password
-        }).ConfigureAwait(false);
-
-        Statics.access_token = Statics.authResponse.AuthenticationResult.AccessToken;
-        Statics.id_token = Statics.authResponse.AuthenticationResult.IdToken;
-        Statics.refresh_token = Statics.authResponse.AuthenticationResult.RefreshToken;
-
-        Statics.myidtoken = new JwtSecurityToken(Statics.id_token);
-        var myaccesstoken = new JwtSecurityToken(Statics.access_token);
-        Console.WriteLine(Statics.myidtoken);
-        Console.WriteLine(myaccesstoken);
-
-        var credentials = new CognitoAWSCredentials(Statics.identityPoolID, RegionEndpoint.EUWest2);
-
-        var providername = $"cognito-idp.{RegionEndpoint.EUWest2.SystemName}.amazonaws.com/{Statics.poolID}";
-        Console.WriteLine(providername);
-        credentials.AddLogin(providername, Statics.id_token);
-        var creds = credentials.GetCredentials();
-        Statics.creds = creds;
-        Statics.credentials = credentials;
-
-        Console.WriteLine("log in id::" + credentials);
-        Console.WriteLine(creds);
+        var success = await Auth.loginUser(email, password);
 
     }
 

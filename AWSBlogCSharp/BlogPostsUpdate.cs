@@ -55,8 +55,8 @@ namespace AWSBlogCSharp
                     Headers = new Dictionary<string, string> { { "Content-Type", "text/plain" } }
                 };
             }
-            
-            BlogPostModel bpm = JsonSerializer.Deserialize<BlogPostModel>( request.Body );
+
+            BlogPostModel bpm = JsonSerializer.Deserialize<BlogPostModel>(request.Body);
             Console.WriteLine("Deserialized body");
 
             Console.WriteLine($"Updating blog with Id :: {id}");
@@ -65,7 +65,7 @@ namespace AWSBlogCSharp
             var base64hash = Utilities.CreateBlogPostHash(user, bpm, id);
             Console.WriteLine("New has will be:::" + base64hash);
 
-            
+
             // do some checking - last hash, new key.
             var latesthash = (from blog in bpc.BlogPost where (blog.Id == id) orderby blog.Date descending select blog).First<DBBlogPost>().Hash;
             bool condition = string.Compare(latesthash, bpm.Hash) == 0; // need identical hashes.
@@ -75,49 +75,60 @@ namespace AWSBlogCSharp
             var newkey = from blog in bpc.BlogPost where (blog.Id == id) && (blog.Version == newVersion) select blog;
             condition = condition && (newkey.ToList<DBBlogPost>().Count == 0);
             Console.WriteLine($"Condition after key test is now {condition}");
-            
-            if (!condition) {
-                return new APIGatewayProxyResponse {
+
+            if (!condition)
+            {
+                return new APIGatewayProxyResponse
+                {
                     StatusCode = (int)HttpStatusCode.BadRequest,
                     Body = "Either duplicate key or the hash is NOT the latest hash!"
                 };
             }
 
+            string fileKey = Utilities.MakeBlogFileName(user, id, newVersion);
             // save the db model
-            DBBlogPost dbbp = new DBBlogPost(id, newVersion, bpm.Title, DateTime.Now, $"/{user}/Blog{id}/Version{newVersion}", bpm.Status, base64hash, user );
-            try {
+            DBBlogPost dbbp = new DBBlogPost(id, newVersion, bpm.Title, DateTime.Now, fileKey, bpm.Status, base64hash, user);
+            try
+            {
                 bpc.BlogPost.Add(dbbp);
                 bpc.SaveChanges();
                 Console.WriteLine("Written to DB");
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 //bpc = GetConnectionString.GetContext(secrets);
-                return new APIGatewayProxyResponse {
-                    StatusCode = (int) HttpStatusCode.BadRequest,
-                    Body = "{ \"Exception\": \""+ex.GetBaseException().ToString()+"\" " +
-                               ((!(ex.InnerException is null)) ? ("\"Inner\":\"" + ex.InnerException.ToString() + "\""): "") + "}"
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Body = "{ \"Exception\": \"" + ex.GetBaseException().ToString() + "\" " +
+                               ((!(ex.InnerException is null)) ? ("\"Inner\":\"" + ex.InnerException.ToString() + "\"") : "") + "}"
                 };
             }
             // let's save the body text to our S3 bucket in a file of our choosing
 
-            AmazonS3Client s3client = new AmazonS3Client( Amazon.RegionEndpoint.EUWest2 );//S3Region.EUW2);
-            var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest {
-                        BucketName = secrets["blogstore"],
-                        Key = $"/{user}/Blog{id}/Version{newVersion}",
-                        ContentBody = bpm.Text
-                        });
+            AmazonS3Client s3client = new AmazonS3Client(Amazon.RegionEndpoint.EUWest2);//S3Region.EUW2);
+            var resp = await s3client.PutObjectAsync(new Amazon.S3.Model.PutObjectRequest
+            {
+                BucketName = secrets["blogstore"],
+                Key = fileKey,
+                ContentBody = bpm.Text
+            });
 
             Console.WriteLine("Written to S3");
 
             // create a response containing the new id - perhaps also a URL - maybe just the URL?
 
-            response = new APIGatewayProxyResponse {
-                        StatusCode = (int)HttpStatusCode.OK,
-                        Body = "{ \"URL\": \"/"+$"{user}/blog/{id}?version={newVersion}" + "\" }",
-                        Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
+            response = new APIGatewayProxyResponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Body = "{ \"URL\": \"/" + $"{user}/blog/{id}?version={newVersion}" + "\" }",
+                Headers = new Dictionary<string, string> { { "Content-Type", "application/json" }
                                                            , { "Access-Control-Allow-Origin" , "*" } }
             };
-        
+
             return response;
         }
+
+
     }
 }

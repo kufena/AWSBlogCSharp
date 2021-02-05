@@ -1,6 +1,7 @@
 ﻿@page "/fetchdata"
 @inject NavigationManager Navigation
 @inject SessionState Statics
+@inject Authentication Auth
 
 
 <h1>All blog posts.</h1>
@@ -44,7 +45,7 @@
         // Initialize the Amazon Cognito credentials provider
 
         //AmazonApiGatewayV2Client apiclient = new AmazonApiGatewayV2Client(Statics.creds);
-
+        Auth.refreshCredentials();
 
         string sub = await Statics.credentials.GetIdentityIdAsync();
         //int p = sub.IndexOf(':');

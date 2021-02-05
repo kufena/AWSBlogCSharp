@@ -49,7 +49,7 @@ namespace AWSBlogCSharp
             context.Logger.LogLine("Get ALL Request\n");
             context.Logger.LogLine($"Here's the identity id = {context.Identity.IdentityId}");
             context.Logger.LogLine($"Here's the pool id = {context.Identity.IdentityPoolId}");
-
+            
             if (request.RequestContext != null && request.RequestContext.Identity != null)
             {
                 var atu = request.RequestContext.Authorizer;

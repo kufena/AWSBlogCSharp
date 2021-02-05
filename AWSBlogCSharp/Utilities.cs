@@ -20,5 +20,11 @@ namespace AWSBlogCSharp
             Console.WriteLine("New Hash:::" + base64hash);
             return base64hash;
         }
+
+        // Make the filename for a particular blog with user, id and version.
+        public static string MakeBlogFileName(string user, int id, int newVersion)
+        {
+            return $"{user}/Blog{id}/Version{newVersion}";
+        }
     }
 }
