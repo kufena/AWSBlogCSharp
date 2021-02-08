@@ -12,13 +12,15 @@ namespace AWSBlogApp2
     public class SessionState
     {
         public SessionState() { }
-        public string access_token { get; set; }
-        public string id_token { get; set; }
-        public string refresh_token { get; set; }
+        public string access_token { get => (user.SessionTokens.AccessToken); }
+        public string id_token { get => (user == null || user.SessionTokens == null ? null : user.SessionTokens.IdToken); }
+        public string refresh_token { get => (user.SessionTokens.RefreshToken); }
         public AuthFlowResponse authResponse { get; set; }
         public ImmutableCredentials creds { get; set; }
-        public JwtSecurityToken myidtoken { get; set; }
+        public JwtSecurityToken myidtoken { get => (new JwtSecurityToken(user.SessionTokens.IdToken)); }
         public CognitoAWSCredentials credentials { get; set; }
+
+        public CognitoUser user { get; set; }
 
         public string poolID = "eu-west-2_Xf5hiOI0w";
         public string clientID = "7dbtqls1deh3cq5ep7g5c1qqe0";

@@ -94,25 +94,16 @@ namespace AWSBlogApp2
                 return false;
             }
 
-            Amazon.CognitoIdentityProvider.Model.AuthenticationResultType
-                x = Statics.authResponse.AuthenticationResult;
-            
             if (Statics.authResponse.AuthenticationResult == null)
             {
                 return false;
             }
-
-            Statics.access_token = Statics.authResponse.AuthenticationResult.AccessToken;
-            Statics.id_token = Statics.authResponse.AuthenticationResult.IdToken;
-            Statics.refresh_token = Statics.authResponse.AuthenticationResult.RefreshToken;
-
-            Statics.myidtoken = new JwtSecurityToken(Statics.id_token);
-            var myaccesstoken = new JwtSecurityToken(Statics.access_token);
+            Statics.user = user;
             Console.WriteLine(Statics.myidtoken);
-            Console.WriteLine(myaccesstoken);
 
-            return await getCredentials();
+            var xxx = await getCredentials();
 
+            return xxx;
         }
 
         public async Task<bool> getCredentials()
@@ -124,6 +115,7 @@ namespace AWSBlogApp2
                 $"cognito-idp.{RegionEndpoint.EUWest2.SystemName}.amazonaws.com/{Statics.poolID}";
             Console.WriteLine(providername);
             credentials.AddLogin(providername, Statics.id_token);
+
             var creds = credentials.GetCredentials();
             Statics.creds = creds;
             Statics.credentials = credentials;
@@ -134,12 +126,50 @@ namespace AWSBlogApp2
             return true;
         }
 
-        public async void refreshCredentials()
+        public async Task<bool> refreshCredentials()
         {
             if (Statics.credentials != null)
             {
-                var newid = Statics.credentials.RefreshIdentityAsync();
+                if (Statics.myidtoken.ValidTo < DateTime.Now)
+                {
+                    //var p2 = new AmazonCognitoIdentityProviderClient(Statics.credentials);
+
+                    var provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), Amazon.RegionEndpoint.EUWest2);
+                    var userPool = new CognitoUserPool(Statics.poolID, Statics.clientID, provider);
+                    var user = new CognitoUser((string)Statics.myidtoken.Payload["email"], Statics.clientID, userPool, provider);
+                    //                    var acpc = new AmazonCognitoIdentityProviderClient(Statics.creds.AccessKey, Statics.creds.SecretKey, Statics.creds.Token);
+                    user.SessionTokens = new CognitoUserSession(Statics.id_token, Statics.access_token, Statics.refresh_token, 
+                        Statics.myidtoken.IssuedAt, DateTime.Now.AddHours(1));
+                    //Statics.user.SessionTokens.ExpirationTime = DateTime.Now.AddHours(1);
+                    var awr = new InitiateRefreshTokenAuthRequest
+                    {
+                        AuthFlowType = AuthFlowType.REFRESH_TOKEN
+                    };
+                    
+                    try
+                    {
+                        //Statics.authResponse = await Statics.user.StartWithRefreshTokenAuthAsync(awr);
+                        Statics.authResponse = await user.StartWithRefreshTokenAuthAsync(awr);
+                        Statics.user = user;
+                        return await getCredentials();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(ex.ToString());
+                        if (ex.InnerException != null)
+                        {
+                            Console.WriteLine(ex.InnerException.Message);
+                            Console.WriteLine(ex.InnerException.ToString());
+                        }
+                    }
+                }
+                else {
+                    var newid = Statics.credentials.RefreshIdentityAsync();
+                    return true;
+                }
             }
+            return false;
         }
     }
 }
