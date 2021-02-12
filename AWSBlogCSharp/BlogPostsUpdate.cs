@@ -6,13 +6,11 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Net;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using MySQL.Data.EntityFrameworkCore;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AWSBlogModel;
 using Amazon.S3;
+using Amazon.XRay.Recorder.Core;
 
 //[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -28,6 +26,7 @@ namespace AWSBlogCSharp
             secrets = GetSecrets.GetSecretsDictionary();
             string connstr = GetSecrets.GetSecretConnectionString();
             bpc = GetConnectionString.GetContext(connstr);
+            AWSXRayRecorder.InitializeInstance();
         }
 
         /// <summary>

@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogModel", "AWSBlogMode
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWSBlogApp2", "AWSBlogApp2\AWSBlogApp2.csproj", "{C8238282-E3E2-4C81-8B2D-4F64A407F1C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSBlogWASM", "AWSBlogWASM\AWSBlogWASM.csproj", "{6EF1687F-6292-465B-808C-C2E0FCB8BE85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C8238282-E3E2-4C81-8B2D-4F64A407F1C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8238282-E3E2-4C81-8B2D-4F64A407F1C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8238282-E3E2-4C81-8B2D-4F64A407F1C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EF1687F-6292-465B-808C-C2E0FCB8BE85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EF1687F-6292-465B-808C-C2E0FCB8BE85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EF1687F-6292-465B-808C-C2E0FCB8BE85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EF1687F-6292-465B-808C-C2E0FCB8BE85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

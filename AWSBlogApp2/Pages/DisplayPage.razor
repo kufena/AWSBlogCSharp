@@ -44,6 +44,10 @@ Text: <textarea cols="40" rows="15" @bind="model.Text" />
     private async void Submit()
     {
         button = false;
+        StateHasChanged();
+
+        Thread.Sleep(5000);
+
         HttpClient client = new HttpClient();
         var content = new StringContent(JsonSerializer.Serialize<BlogPostModel>(model));
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");

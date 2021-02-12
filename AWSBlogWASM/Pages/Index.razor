@@ -1,0 +1,21 @@
+﻿@page "/"
+@inject SessionState Statics
+@inject Authentication Auth
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+Email: <input name="Email" @bind-value="email" type="email" />
+Password: <input name="Password" @bind-value="password" type="password" />
+
+<button @onclick="SignIn">Sign In</button>
+@code {
+    string email = "";
+    string password ="";
+
+    protected async void SignIn()
+    {
+        await Auth.loginUser(email, password);
+    }
+}

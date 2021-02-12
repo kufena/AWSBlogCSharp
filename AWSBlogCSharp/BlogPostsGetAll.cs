@@ -1,22 +1,13 @@
 ﻿using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.Json;
 using AWSBlogCSharp.Database;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
-using Amazon.S3;
 using System.Threading.Tasks;
-using System.IO;
 using AWSBlogModel;
-using Amazon.CognitoIdentity.Model;
-using Amazon.Extensions.CognitoAuthentication;
-using Amazon.Runtime;
+using Amazon.XRay.Recorder.Core;
 
 [assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -32,6 +23,7 @@ namespace AWSBlogCSharp
             string connstr = GetSecrets.GetSecretConnectionString();
             Console.WriteLine($"Connection string:: {connstr}");
             bpc = GetConnectionString.GetContext(connstr);
+            AWSXRayRecorder.InitializeInstance();
         }
 
         /// <summary>
@@ -41,6 +33,7 @@ namespace AWSBlogCSharp
         /// <returns>The API Gateway response.</returns>
         public async Task<APIGatewayProxyResponse> Get(APIGatewayProxyRequest request, ILambdaContext context)
         {
+
             string user = request.PathParameters["user"];
 
             context.Logger.LogLine($"USER PARAMETER IS {user}");
