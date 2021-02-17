@@ -9,13 +9,16 @@ Welcome to your new app.
 Email: <input name="Email" @bind-value="email" type="email" />
 Password: <input name="Password" @bind-value="password" type="password" />
 
-<button @onclick="SignIn">Sign In</button>
+<button @onclick="SignIn" disabled="@disabled">Sign In</button>
 @code {
     string email = "";
     string password ="";
+    bool disabled = false;
 
     protected async void SignIn()
     {
+        disabled = true;
+        StateHasChanged();
         await Auth.loginUser(email, password);
     }
 }

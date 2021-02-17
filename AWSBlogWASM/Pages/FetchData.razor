@@ -1,55 +1,96 @@
-@page "/fetchdata"
-@inject HttpClient Http
+﻿@page "/fetchdata"
+@inject NavigationManager Navigation
+@inject SessionState Statics
+@inject Authentication Auth
 
-<h1>Weather forecast</h1>
+
+<h1>All blog posts.</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (forecasts == null)
+@if (blogposts == null)
 {
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
+<p><em>Loading...</em></p> }
+            else
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Text</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var (id, blog) in blogposts)
+        {
+<tr>
+    <td>@blog.Date.ToShortDateString()</td>
+    <td>@blog.Title</td>
+    <td><button @onclick="@(() => NavigateToCounterComponent(id))">View</button></td>
+</tr>}
+    </tbody>
+</table>}
 
-@code {
-    private WeatherForecast[] forecasts;
+@code { 
+
+    protected bool disabled = false;
+
+    private Dictionary<int, BlogPostURL> blogposts;
+
+    public void NavigateToCounterComponent(int id)
+    {
+        Navigation.NavigateTo($"displaypage/{id}");
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-    }
 
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
+        // Initialize the Amazon Cognito credentials provider
 
-        public int TemperatureC { get; set; }
+        //AmazonApiGatewayV2Client apiclient = new AmazonApiGatewayV2Client(Statics.creds);
+        await Auth.refreshCredentials();
 
-        public string Summary { get; set; }
+        string sub = await Statics.credentials.GetIdentityIdAsync();
+        //int p = sub.IndexOf(':');
+        //sub = sub.Substring(p + 1);
+        blogposts = new Dictionary<int, BlogPostURL>();
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    }
-}
+        var client = new HttpClient();
+
+        HttpRequestMessage hrm = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{Statics.apiURL}{sub}/"),
+            Method = HttpMethod.Get
+        };
+        //hrm.Headers.Add("X-Amz-Date", DateTime.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
+        var signer = new AWS4RequestSigner(
+                            Statics.creds.AccessKey,
+                            Statics.creds.SecretKey);
+
+
+        hrm.SetBrowserRequestMode(BrowserRequestMode.NoCors);
+        hrm.SetBrowserRequestCredentials(BrowserRequestCredentials.Include); var request = await signer.Sign(hrm, "execute-api", "eu-west-2");
+
+        //hrm.Headers.Add("Authorization", Statics.id_token);
+
+        var response = await client.SendAsync(
+            request);
+
+        //var response = await client.GetAsync(
+        //  $"{Statics.apiURL}{sub}/",
+        //  regionName: "eu-west-2",
+        //  serviceName: "execute-api",
+        //  credentials: Statics.creds);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var blogstr = await response.Content.ReadAsStringAsync();
+            var blogs = JsonSerializer.Deserialize<BlogPostURL[]>(blogstr);
+            foreach (var b in blogs) blogposts.Add(b.Id, b);
+        }
+        else
+        {
+            Console.WriteLine($"Expected better.  {response.StatusCode} {response.ReasonPhrase} {response.RequestMessage}");
+        }
+    } }
