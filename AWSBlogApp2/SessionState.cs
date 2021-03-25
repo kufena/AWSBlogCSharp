@@ -22,9 +22,10 @@ namespace AWSBlogApp2
 
         public CognitoUser user { get; set; }
 
-        public string poolID = "eu-west-2_Xf5hiOI0w";
-        public string clientID = "7dbtqls1deh3cq5ep7g5c1qqe0";
-        public string identityPoolID = "eu-west-2:1bd6fd52-1888-40ea-8945-cfbf744bad06";
-        public string apiURL = @"https://7le2dptssk.execute-api.eu-west-2.amazonaws.com/Prod/";
+        public string poolID = "eu-west-2_Ztx8PsrKU";
+        public string clientID = "7fh8uega51v8dhaqddhv3cdse8";
+        public string identityPoolID = "eu-west-2:8f7f325c-d76e-4b12-8b88-b9ce29cfbfe5";
+        public string apiURL = @"https://4x02wmhwbc.execute-api.eu-west-2.amazonaws.com/Prod/";
+               
     }
 }

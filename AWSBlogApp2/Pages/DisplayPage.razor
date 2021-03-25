@@ -28,8 +28,9 @@ Text: <textarea cols="40" rows="15" @bind="model.Text" />
             Status = false
         };
 
-        var url = $"{Statics.apiURL}{Statics.credentials.GetIdentityId()}/blog/{id}";
-
+        string nickname = (string)Statics.myidtoken.Payload["nickname"];
+        var url = $"{Statics.apiURL}{nickname}/blog/{id}";
+        //var url = $"{Statics.apiURL}{Statics.credentials.GetIdentityId()}/blog/{id}";
         var client = new HttpClient();
         var response = await client.GetAsync(url, regionName: "eu-west-2", serviceName: "execute-api", credentials: Statics.creds);
 
@@ -54,9 +55,12 @@ Text: <textarea cols="40" rows="15" @bind="model.Text" />
         //"application/json";
 
         var sub = await Statics.credentials.GetIdentityIdAsync();
+        string nickname = (string)Statics.myidtoken.Payload["nickname"];
+        var url = $"{Statics.apiURL}{nickname}/blog/{id}";
+
         var message = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{Statics.apiURL}{sub}/blog/{id}"),
+            RequestUri = new Uri(url),
             Method = HttpMethod.Put,
             Content = content
         };

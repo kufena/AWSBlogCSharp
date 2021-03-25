@@ -28,7 +28,9 @@
         Console.WriteLine("How's that?");
 
         var sub = await Statics.credentials.GetIdentityIdAsync();
-        string url = Statics.apiURL + sub + "/blog/";
+        string nickname = (string)Statics.myidtoken.Payload["nickname"];
+
+        string url = Statics.apiURL + nickname + "/blog/";
 
         Console.WriteLine($"We are going here :: " + url); var content = new StringContent(modeltext, System.Text.Encoding.UTF8, "application/json"); //System.Net.Http.Json.JsonContent.Create<BlogPostModel>(model, null, null);
         var response = await client.PostAsync(url, content,

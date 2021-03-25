@@ -52,7 +52,8 @@
       "Properties": {
         "UserPoolId" : { "Ref" : "BlogPostUserPool" },
         "ClientName" : "BlogPostUserPoolClient",
-        "GenerateSecret" : false
+        "GenerateSecret" : false,
+        "WriteAttributes": ["nickname","email"]
       }
     },
     "MyApi": {
@@ -82,8 +83,8 @@
        "AllowUnauthenticatedIdentities" : false,
        "CognitoIdentityProviders" : [
          {
-         "ClientId" : {"Ref": "BlogPostUserPoolClient"}
-         "ProviderName" : {"Fn::GetAtt": ["BlogPostUserPool","ProviderName"]}
+           "ClientId" : {"Ref": "BlogPostUserPoolClient"},
+           "ProviderName" : {"Fn::GetAtt": ["BlogPostUserPool","ProviderName"]}
          }
        ]
       }
